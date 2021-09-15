@@ -1,15 +1,15 @@
 "use strict";
 
 /**************************************************
-Draw an Alien
+Activity 02: Draw an Alien
 Owen Avon
 
-An actvity to create an alien with p5's drawing and colour functions.
+Draws an alien on the canvas using p5.
 **************************************************/
 
 // setup()
 //
-// Description of setup() goes here.
+// Draws an alien.
 function setup() {
   createCanvas(640, 480);
 
