@@ -33,6 +33,10 @@ function draw() {
   circle.x = circle.x + circle.speed;
   ellipse(circle.x, circle.y, circle.size);
 
+  console.log(`circle.x: ${circle.x}, circle.y ${circle.y}, circle.size ${circle.size}, circle.speed ${circle.speed}`); // Template string is the advised way to print information.
+
+  // console.log("circle.x: " + circle.x); // Static text inside ""
+
   // circleSpeed = circleSpeed + circleAcceleration; // optional shortform. circleSpeed += circleAcceleration;
   // backgroundShade = backgroundShade + 1;
   // circleSize = circleSize * 1.01;
