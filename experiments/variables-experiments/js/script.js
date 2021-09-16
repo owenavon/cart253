@@ -11,10 +11,11 @@ let backgroundShade = 0;
 // let circleAcceleration = 0.25;
 
 let circle = { // Object
-  x: 0, // Properties
+  x: 250, // Properties
   y: 250,
-  size: 200,
-  speed: 2
+  size: 100,
+  speed: 1,
+  fill: 0
 };
 
 // setup()
@@ -30,10 +31,20 @@ function setup() {
 // Draw() draws the functions at 60 FPS.
 function draw() {
   background(backgroundShade);
+
+  circle.speed = random(-5, 5);
   circle.x = circle.x + circle.speed;
+  circle.y = random(0, height);
+  circle.size = random(10, 100);
+
+  circle.fill = random(0, 255);
+  fill(circle.fill);
   ellipse(circle.x, circle.y, circle.size);
 
-  console.log(`circle.x: ${circle.x}, circle.y ${circle.y}, circle.size ${circle.size}, circle.speed ${circle.speed}`); // Template string is the advised way to print information.
+  // let randomNumber = random();
+  // console.log(randomNumber);
+
+  // console.log(`circle.x: ${circle.x}, circle.y ${circle.y}, circle.size ${circle.size}, circle.speed ${circle.speed}`); // Template string is the advised way to print information.
 
   // console.log("circle.x: " + circle.x); // Static text inside ""
 
