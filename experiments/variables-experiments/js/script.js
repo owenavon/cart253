@@ -8,11 +8,14 @@ This exercise introduces variables
 "use strict";
 
 let backgroundShade = 0;
-let circleX = 0;
-let circleY = 250;
-let circleSize = 200;
-let circleSpeed = 2;
-let circleAcceleration = 0.25;
+// let circleAcceleration = 0.25;
+
+let circle = { // Object
+  x: 0, // Properties
+  y: 250,
+  size: 200,
+  speed: 2
+};
 
 // setup()
 //
@@ -27,10 +30,10 @@ function setup() {
 // Draw() draws the functions at 60 FPS.
 function draw() {
   background(backgroundShade);
-  circleX = circleX + circleSpeed;
-  circleSpeed = circleSpeed + circleAcceleration; // optional shortform. circleSpeed += circleAcceleration;
-  ellipse(circleX, circleY, circleSize);
+  circle.x = circle.x + circle.speed;
+  ellipse(circle.x, circle.y, circle.size);
 
+  // circleSpeed = circleSpeed + circleAcceleration; // optional shortform. circleSpeed += circleAcceleration;
   // backgroundShade = backgroundShade + 1;
   // circleSize = circleSize * 1.01;
   // circleY = circleY / 1.01;
