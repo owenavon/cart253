@@ -7,25 +7,26 @@ This exercise introduces variables
 
 "use strict";
 
-// preload()
-//
-// Description of preload() goes here.
-function preload() {
-
-}
+let backgroundShade = 0;
+let circleX = 250;
+let circleY = 250;
+let circleSize = 100;
 
 // setup()
 //
 // Description of setup() goes here.
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(500, 500);
+  // createCanvas(windowWidth, windowHeight);
 }
 
 // draw()
 //
 // Description of draw() goes here.
 function draw() {
-  background(255, 0, 0);
-  rectMode(CENTER);
-  rect(width / 2, height / 2, 100, 100);
+  background(backgroundShade);
+  ellipse(circleX, circleY, circleSize);
+  // rect(mouseX, mouseY);
+  // rectMode(CENTER);
+  // rect(width / 2, height / 2, 100, 100);
 }
