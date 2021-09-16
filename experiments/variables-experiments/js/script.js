@@ -1,33 +1,31 @@
 /**
-Title of Project
-Author Name
+Introducing Variables
+Owen Avon
 
-This is a template. You must fill in the title,
-author, and this description to match your project!
+This exercise introduces variables
 */
 
 "use strict";
 
-
-/**
-Description of preload
-*/
+// preload()
+//
+// Description of preload() goes here.
 function preload() {
 
 }
 
-
-/**
-Description of setup
-*/
+// setup()
+//
+// Description of setup() goes here.
 function setup() {
-
+  createCanvas(windowWidth, windowHeight);
 }
 
-
-/**
-Description of draw()
-*/
+// draw()
+//
+// Description of draw() goes here.
 function draw() {
-
+  background(255, 0, 0);
+  rectMode(CENTER);
+  rect(width / 2, height / 2, 100, 100);
 }
