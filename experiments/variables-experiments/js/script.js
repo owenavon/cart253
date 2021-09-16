@@ -11,11 +11,11 @@ let backgroundShade = 0;
 // let circleAcceleration = 0.25;
 
 let circle = { // Object
-  x: 250, // Properties
+  x: 0, // Properties
   y: 250,
   size: 100,
   speed: 1,
-  fill: 0
+  fill: 255
 };
 
 // setup()
@@ -32,20 +32,24 @@ function setup() {
 function draw() {
   background(backgroundShade);
 
-  circle.speed = random(-5, 5);
   circle.x = circle.x + circle.speed;
-  circle.y = random(0, height);
-  circle.size = random(10, 100);
+  circle.x = constrain(circle.x, 0, width); // Constrain circle.x to the wdith of the screen.
 
-  circle.fill = random(0, 255);
+  circle.fill = map(circle.x, 0, width, 0, 255); //Value we want to convert - What it comes from - Range wewould like it to be.
   fill(circle.fill);
   ellipse(circle.x, circle.y, circle.size);
+
+  // circle.size = map(mouseY, height, 0, 50, 500);
+
+  // circle.speed = random(-5, 5);
+  // circle.y = random(0, height);
+  // circle.size = random(10, 100);
+  // circle.fill = random(0, 255);
 
   // let randomNumber = random();
   // console.log(randomNumber);
 
   // console.log(`circle.x: ${circle.x}, circle.y ${circle.y}, circle.size ${circle.size}, circle.speed ${circle.speed}`); // Template string is the advised way to print information.
-
   // console.log("circle.x: " + circle.x); // Static text inside ""
 
   // circleSpeed = circleSpeed + circleAcceleration; // optional shortform. circleSpeed += circleAcceleration;
