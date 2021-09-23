@@ -78,18 +78,12 @@ function draw() {
   ellipse(redCircle.x, redCircle.y, redCircle.size);
 
   // Tinted Ellipse
-
   tintEllipse.fill = map(mouseY, width / 4, height, 0, 255);
-
   tintEllipse.size = map(mouseY, height, 0, 50, 500);
-
   tintEllipse.size = constrain(tintEllipse.size, 0, 500);
-
   fill(tintEllipse.fill, tintEllipse.alpha);
   strokeWeight(tintEllipse.weight);
   ellipse(tintEllipse.x, tintEllipse.y, tintEllipse.size);
-
-
 
   // White "C"
   whiteC.y = whiteC.y + whiteC.speed;
