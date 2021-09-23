@@ -76,7 +76,7 @@ function draw() {
 
   // Red Circle
   redCircle.size = redCircle.size + redCircle.growthRate; // Allows red circle to grow to canvass size.
-  redCircle.size = constrain(redCircle.size, 0, width); // Constrains red circle to convass size.
+  redCircle.size = constrain(redCircle.size, 0, width); // Constrains red circle to canvass size.
   fill(redCircle.r, redCircle.g, redCircle.b); // Makes the circle burgundy in colour.
   strokeWeight(redCircle.weight); // Removes the circle's stroke.
   ellipse(redCircle.x, redCircle.y, redCircle.size); // Draws the red circle (Ellipse).
@@ -93,9 +93,9 @@ function draw() {
   whiteC.y = whiteC.y + whiteC.speed; // Allows the "C" to vertically translate onto the canvass.
   whiteC.y = constrain (whiteC.y, 0, whiteC.x,); // Prevents the "C" from translating off of the canvass.
   whiteC.size = redCircle.size * whiteC.sizeRatio; // Makes the "C" shape relative to the red circle shape.
-  fill(whiteC.fill, whiteC.alpha); // Makes the arc ("C") fill grey, however the opcaity is then set to 0 so that the fill is not seen.
+  fill(whiteC.fill, whiteC.alpha); // Makes the arc ("C") fill grey, however the opacity is then set to 0 so that the fill is not seen.
   stroke(whiteC.letterColour); // Makes the "C"'s stroke white in colour.
-  strokeCap(SQUARE); // Makes the end of the "C"s square instead of the default round.
+  strokeCap(SQUARE); // Makes the end of the "C"s square instead of the default round edges.
   strokeWeight(whiteC.weight); // Provides the "C"s stroke weight, and ultimately allows the "C" to be seen.
   translate(whiteC.x, whiteC.y); // Provides coordinates for the resting postion of the "C".
 
