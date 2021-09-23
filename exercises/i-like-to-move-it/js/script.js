@@ -8,20 +8,33 @@ This program explores the animation shapes and backgrounds.
 "use strict";
 
 let bg = {
-  r: 128,
-  g: 128,
-  b: 128,
+  r: 125,
+  g: 125,
+  b: 125,
+  fps:0.5,
 };
 
 let redCircle = {
   x: 250,
   y: 250,
+  r: 147,
+  g: 35,
+  b: 57,
   size: 100,
   growthRate: 1.5,
   speed: 1,
-  stroke: 0,
-  fill: 128,
-  alpha: 200
+  weight: 0,
+  fill: 125,
+  alpha: 500
+};
+
+let tintEllipse = {
+  x: 250,
+  y: 250,
+  size: 100,
+  weight: 0,
+  fill: 255,
+  alpha: 100,
 };
 
 let whiteC = {
@@ -30,7 +43,9 @@ let whiteC = {
   size: 75,
   sizeRatio: 0.75,
   speed: 1.5,
-  stroke: 50,
+  weight: 40,
+  cHeight: 375,
+  letterColour: 255,
   fill: 0,
   alpha: 0,
 };
@@ -48,29 +63,40 @@ function setup() {
 // Description of draw() goes here
 
 function draw() {
+
   // Background
-
   background(bg.r, bg.g, bg.b);
-
-  bg.r, bg.g, bg.b = map(redCircle.size, 100, width, 0, 128);
-  bg.r = bg.r + 1, bg.g = bg.g + 1, bg.b = bg.b +1;
+  bg.r = bg.r + bg.fps, bg.g = bg.g + bg.fps, bg.b = bg.b + bg.fps;
 
   // Red Circle
   redCircle.x = redCircle.x + redCircle.speed;
   redCircle.x = constrain(redCircle.x, 0, width / 2);
   redCircle.size = redCircle.size + redCircle.growthRate;
   redCircle.size = constrain(redCircle.size, 0, width);
-  fill(redCircle.fill, redCircle.alpha);
-  strokeWeight(redCircle.stroke);
+  fill(redCircle.r, redCircle.g, redCircle.b);
+  strokeWeight(redCircle.weight);
   ellipse(redCircle.x, redCircle.y, redCircle.size);
 
-  // White C
+  // Tinted Ellipse
+
+  tintEllipse.fill = map(mouseY, width / 4, height, 0, 255);
+
+  tintEllipse.size = map(mouseY, height, 0, 50, 500);
+
+  tintEllipse.size = constrain(tintEllipse.size, 0, 500);
+
+  fill(tintEllipse.fill, tintEllipse.alpha);
+  strokeWeight(tintEllipse.weight);
+  ellipse(tintEllipse.x, tintEllipse.y, tintEllipse.size);
+
+
+
+  // White "C"
   whiteC.y = whiteC.y + whiteC.speed;
   whiteC.y = constrain (whiteC.x, 0, whiteC.y, width);
   whiteC.size = redCircle.size * whiteC.sizeRatio;
   fill(whiteC.fill, whiteC.alpha);
-  strokeWeight(whiteC.stroke);
-  arc(whiteC.x, whiteC.y, whiteC.size, 375, PI / 2, 3 * PI / 2, OPEN); // 180 degrees
-  arc(mouseX, 0, mouseX, 100);
-  // ellipse(whiteC.x, whiteC.y, whiteC.size);
+  stroke(whiteC.letterColour);
+  strokeWeight(whiteC.weight);
+  arc(whiteC.x, whiteC.y, whiteC.size, whiteC.cHeight, PI / 2, 3 * PI / 2, OPEN); // 180 degrees
 }
