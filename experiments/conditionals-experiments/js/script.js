@@ -6,6 +6,12 @@
 
 "use strict";
 
+let caterpillar = {
+  x: 100,
+  y: 250,
+  segmentSize: 50
+}
+
 // let backgroundShade = 0;
 // let circle = {
 //   x: 0,
@@ -14,7 +20,7 @@
 //   speed: 1,
 // }
 
-let displayCircle = false; // Don't display circle untill we click on canvas.
+// let displayCircle = false; // Don't display circle untill we click on canvas.
 
 // Description of setup()
 function setup() {
@@ -23,18 +29,52 @@ function setup() {
 
 // Description of draw()
 function draw() {
-
   background(0);
+  noStroke();
+  fill(100, 200, 100);
 
-  if (mouseIsPressed) {
-    displayCircle = true; // If we click, then display white circle.
-  }
+  // let x = caterpillar.x;
+  // let numSegments = 10;
+  // let segmentsDrawn = 0;
+  //
+  // while (segmentsDrawn < numSegments) { // Like an if satement ince it keeps doing the action inside until it becomes false
+  //   ellipse(x, caterpillar.y, caterpillar.segmentSize); // Happens right away. You cannot animate with this. Happens in one frame.
+  //   x = x + 40;
+  //   segmentsDrawn ++; // segmentsDrawn = segmentsDrawn + 1;
+  //   }
 
-  if (displayCircle) {
-    ellipse(250, 250, 100, 100);
+    let x = caterpillar.x;
+    let numSegments = 10;
+
+    for (let segmentsDrawn = 0; segmentsDrawn < numSegments; segmentsDrawn++) { // Can replace segmentsDraw with "i". Specialised version of whileloop's based on counting.
+      ellipse(x, caterpillar.y, caterpillar.segmentSize); // Most common loops are loops that counts from zero up to a set number.
+      x = x + 40;
     }
   }
 
+  // ellipse(x, caterpillar.y, caterpillar.segmentSize);
+  // x = x + 40;
+  //
+  // ellipse(x, caterpillar.y, caterpillar.segmentSize);
+  // x = x + 40;
+  //
+  // ellipse(x, caterpillar.y, caterpillar.segmentSize);
+  // x = x + 40;
+  //
+  // ellipse(x, caterpillar.y, caterpillar.segmentSize);
+  // x = x + 40;
+  //
+  // ellipse(x, caterpillar.y, caterpillar.segmentSize);
+
+  // background(0);
+  //
+  // if (mouseIsPressed) {
+  //   displayCircle = true; // If we click, then display white circle.
+  // }
+  //
+  // if (displayCircle) {
+  //   ellipse(250, 250, 100, 100);
+  //   }
 
   // background(backgroundShade);
   //
