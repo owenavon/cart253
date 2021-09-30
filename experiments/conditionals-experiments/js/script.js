@@ -6,17 +6,11 @@
 
 "use strict";
 
-let circle = {
-  x: undefined,
-  y: undefined,
-  size: 100
-};
-
-let dangerZone = {
-  x: 250,
-  y: 250,
-  size: 150
-}
+// let dangerZone = {
+//   x: 250,
+//   y: 250,
+//   size: 150
+// }
 
 // let backgroundShade = 0;
 // let circle = {
@@ -28,35 +22,59 @@ let dangerZone = {
 
 // let displayCircle = false; // Don't display circle untill we click on canvas.
 
+let bg = {
+  r: 0,
+  g: 0,
+  b: 0,
+}
+
+let circle = {
+  x: 250,
+  y: 250,
+  size: 100
+}
+
 // Description of setup()
 function setup() {
   createCanvas(500, 500);
 
-  circle.x = random(0, width);
-  circle.y = random(0, height);
-
-  let d = dist(circle.x, circle.y, dangerZone.x, dangerZone.y);
-  while (d < circle.size / 2 + dangerZone.size/2) {
-    circle.x = random(0, width);
-    circle.y = random(0, height);
-    d = dist(circle.x, circle.y, dangerZone.x, dangerZone.y);
-  }
+  // circle.x = random(0, width);
+  // circle.y = random(0, height);
 }
 
 // Description of draw()
 function draw() {
   background(0);
+  background(bg.r, bg.g, bg.b);
+
+
+ellipse(circle.x, circle.y, circle.size);
+}
+
+function mousePressed() {
+  bg.r = random(0, 255);
+  bg.g = random(0, 255);
+  bg.b = random(0, 255);
+}
+
+//   let d = dist(circle.x, circle.y, dangerZone.x, dangerZone.y);
+//   while (d < circle.size / 2 + dangerZone.size/2) {
+//     circle.x = random(0, width);
+//     circle.y = random(0, height);
+//     d = dist(circle.x, circle.y, dangerZone.x, dangerZone.y);
+//   }
+// }
 
 // Danger zone
-noFill();
-stroke(255, 0, 0);
-ellipse(dangerZone.x, dangerZone.y, dangerZone.size);
-
-
-
-  fill (255);
-  noStroke();
-  ellipse(circle.x, circle.y, circle.size);
+// noFill();
+// stroke(255, 0, 0);
+// ellipse(dangerZone.x, dangerZone.y, dangerZone.size);
+//
+//
+//
+//   fill (255);
+//   noStroke();
+//   ellipse(circle.x, circle.y, circle.size);
 
   // let x = caterpillar.x;
   // let numSegments = 10;
@@ -75,7 +93,6 @@ ellipse(dangerZone.x, dangerZone.y, dangerZone.size);
     //   ellipse(x, caterpillar.y, caterpillar.segmentSize); // Most common loops are loops that counts from zero up to a set number.
     //   x = x + 40;
     // }
-  }
 
   // ellipse(x, caterpillar.y, caterpillar.segmentSize);
   // x = x + 40;
