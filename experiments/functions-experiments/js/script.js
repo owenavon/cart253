@@ -14,18 +14,32 @@
 //   vy: 0
 // }
 
-let hello = {
-  string: `Hello, world!`,
+// let hello = {
+//   string: `Hello, world!`,
+//   x: 0,
+//   y: 0,
+//   vx: 5,
+//   vy: 1,
+//   size: 64
+// }
+
+let circle = {
   x: 0,
-  y: 0,
-  vx: 5,
-  vy: 1,
-  size: 64
-}
+  y: 250,
+  size: 100,
+  vx: 0,
+  vy: 0,
+  speed: 2
+};
+
+let state = `title`; // Possible states are: title, animation, ending.
 
 // Description of setup()
 function setup() {
   createCanvas(500, 500);
+  circle.vx = circle.speed;
+  textSize(32);
+  textAlign(CENTER, CENTER);
 
   // let hotCelsius = toCelsius(100);
   // console.log(`100 degrees Farenheit is ${hotCelsius} degrees Celsius.`);
@@ -38,20 +52,61 @@ function setup() {
 function draw() {
   background(0);
 
-  hello.x = hello.x + hello.vx;
-  hello.y = hello.y + hello.vy;
+  if (state === `title`) {
+    title();
+  }
+  else if (state === `animation`) {
+    animation();
+  }
+  else if (state === `ending`) {
+    ending();
+  }
+}
 
-  hello.size = hello.size + 1;
+function title () { // Created are own functions to tidy up the code.
+  // Title
+  fill(255);
+  text(`Life.`, width/2, height/2);
+}
 
-  textAlign(CENTER, CENTER); // Centered horizontally and vertically to the indicated x and y.
-  textSize(hello.size);
-  textStyle(BOLD);
+function animation () { // Created are own functions to tidy up the code.
+  // Animation
+  circle.x = circle.x + circle.vx;
+  circle.y = circle.y + circle.vy;
 
-  fill(200, 50, 200);
-  stroke(50, 200, 50);
-  strokeWeight(3);
+  if (circle.x > width) {
+    state = `ending`;
+  }
 
-  text(hello.string, hello.x, hello.y); //text function is used to display text on the screen.
+  ellipse(circle.x, circle.y, circle.size);
+}
+
+function ending () { // Created are own functions to tidy up the code.
+  // Ending
+  fill(127);
+  text(`It's all over.`, width/2, height/2);
+}
+
+function keyPressed() {
+  if (state === `title`) {
+    state = `animation`;
+  }
+}
+
+  // hello.x = hello.x + hello.vx;
+  // hello.y = hello.y + hello.vy;
+  //
+  // hello.size = hello.size + 1;
+  //
+  // textAlign(CENTER, CENTER); // Centered horizontally and vertically to the indicated x and y.
+  // textSize(hello.size);
+  // textStyle(BOLD);
+  //
+  // fill(200, 50, 200);
+  // stroke(50, 200, 50);
+  // strokeWeight(3);
+  //
+  // text(hello.string, hello.x, hello.y); //text function is used to display text on the screen.
 
   // let x = random(0, width);
   // let y = random (0, height);
@@ -62,7 +117,7 @@ function draw() {
   // parallels (50, 50, 10, 2, 20, 10);
   // parallels (200, 200, 15, 7, 3, 20);
   // parallels (312, 257, 20, 0.5, 300, 2);
-}
+
 
 // function toCelsius(fahrenheit) { // Function is called signature. Parameter
 //   let celsius = (fahrenheit - 32) * 5/9; // Variable
