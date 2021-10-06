@@ -23,26 +23,23 @@
 //   size: 64
 // }
 
-// let circle = {
-//   x: 0,
-//   y: 250,
-//   size: 100,
-//   vx: 0,
-//   vy: 0,
-//   speed: 2
-// };
-//
-// let state = `title`; // Possible states are: title, animation, ending.
+let circle = {
+  x: 0,
+  y: 250,
+  size: 100,
+  vx: 0,
+  vy: 0,
+  speed: 2
+};
 
-let bg = 0;
+let state = `title`; // Possible states are: title, animation, ending.
 
 // Description of setup()
 function setup() {
   createCanvas(500, 500);
-
-  // circle.vx = circle.speed;
-  // textSize(32);
-  // textAlign(CENTER, CENTER);
+  circle.vx = circle.speed;
+  textSize(32);
+  textAlign(CENTER, CENTER);
 
   // let hotCelsius = toCelsius(100);
   // console.log(`100 degrees Farenheit is ${hotCelsius} degrees Celsius.`);
@@ -53,79 +50,48 @@ function setup() {
 
 // Description of draw()
 function draw() {
-  background(bg);
+  background(0);
 
-  if (keyIsDown(65)) {
-    rectMode(CENTER);
-    rect(250, 250, 100, 100);
+  if (state === `title`) {
+    title();
   }
-
-  // textAlign(CENTER, CENTER);
-  // textSize(64);
-  // fill(255);
-  // text(keyCode, width/2, height/2); // keyCode = ASCII keycode.
+  else if (state === `animation`) {
+    animation();
+  }
+  else if (state === `ending`) {
+    ending();
+  }
 }
 
-// function keyPressed() {
-//   if(keyCode === UP_ARROW) {
-//     bg = bg + 10;
-//     bg = constrain(bg, 0, 255);
-//   }
-//   else if (keyCode === DOWN_ARROW) {
-//     bg = bg - 10;
-//     bg = constrain(bg, 0, 255);
-//   }
-// }
+function title () { // Created are own functions to tidy up the code.
+  // Title
+  fill(255);
+  text(`Life.`, width/2, height/2);
+}
 
-  // if (key === `a`) {
-  //   bg = 0;
-  // }
-  // else if ( key === `b`) {
-  //   bg = 127;
-  // }
-  // else if ( key === `c`) {
-  //   bg = 255;
-  // }
+function animation () { // Created are own functions to tidy up the code.
+  // Animation
+  circle.x = circle.x + circle.vx;
+  circle.y = circle.y + circle.vy;
 
-//   if (state === `title`) {
-//     title();
-//   }
-//   else if (state === `animation`) {
-//     animation();
-//   }
-//   else if (state === `ending`) {
-//     ending();
-//   }
-// }
-//
-// function title () { // Created are own functions to tidy up the code.
-//   // Title
-//   fill(255);
-//   text(`Life.`, width/2, height/2);
-// }
-//
-// function animation () { // Created are own functions to tidy up the code.
-//   // Animation
-//   circle.x = circle.x + circle.vx;
-//   circle.y = circle.y + circle.vy;
-//
-//   if (circle.x > width) {
-//     state = `ending`;
-//   }
-//
-//   ellipse(circle.x, circle.y, circle.size);
-// }
-//
-// function ending () { // Created are own functions to tidy up the code.
-//   // Ending
-//   fill(127);
-//   text(`It's all over.`, width/2, height/2);
-// }
-//
-// function keyPressed() {
-//   if (state === `title`) {
-//     state = `animation`;
-//   }
+  if (circle.x > width) {
+    state = `ending`;
+  }
+
+  ellipse(circle.x, circle.y, circle.size);
+}
+
+function ending () { // Created are own functions to tidy up the code.
+  // Ending
+  fill(127);
+  text(`It's all over.`, width/2, height/2);
+}
+
+function keyPressed() {
+  if (state === `title`) {
+    state = `animation`;
+  }
+}
 
   // hello.x = hello.x + hello.vx;
   // hello.y = hello.y + hello.vy;
