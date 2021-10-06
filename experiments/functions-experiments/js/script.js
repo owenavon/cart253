@@ -14,20 +14,44 @@
 //   vy: 0
 // }
 
+let hello = {
+  string: `Hello, world!`,
+  x: 0,
+  y: 0,
+  vx: 5,
+  vy: 1,
+  size: 64
+}
+
 // Description of setup()
 function setup() {
   createCanvas(500, 500);
 
-  let hotCelsius = toCelsius(100);
-  console.log(`100 degrees Farenheit is ${hotCelsius} degrees Celsius.`);
-
-  let coldCelsius = toCelsius(10);
-  console.log(`10 degrees Fahrenheit is ${coldCelsius} degrees Celsius.`);
+  // let hotCelsius = toCelsius(100);
+  // console.log(`100 degrees Farenheit is ${hotCelsius} degrees Celsius.`);
+  //
+  // let coldCelsius = toCelsius(10);
+  // console.log(`10 degrees Fahrenheit is ${coldCelsius} degrees Celsius.`);
 }
 
 // Description of draw()
 function draw() {
   background(0);
+
+  hello.x = hello.x + hello.vx;
+  hello.y = hello.y + hello.vy;
+
+  hello.size = hello.size + 1;
+
+  textAlign(CENTER, CENTER); // Centered horizontally and vertically to the indicated x and y.
+  textSize(hello.size);
+  textStyle(BOLD);
+
+  fill(200, 50, 200);
+  stroke(50, 200, 50);
+  strokeWeight(3);
+
+  text(hello.string, hello.x, hello.y); //text function is used to display text on the screen.
 
   // let x = random(0, width);
   // let y = random (0, height);
@@ -40,10 +64,10 @@ function draw() {
   // parallels (312, 257, 20, 0.5, 300, 2);
 }
 
-function toCelsius(fahrenheit) { // Function is called signature. Parameter
-  let celsius = (fahrenheit - 32) * 5/9; // Variable
-  return celsius;
-}
+// function toCelsius(fahrenheit) { // Function is called signature. Parameter
+//   let celsius = (fahrenheit - 32) * 5/9; // Variable
+//   return celsius;
+// }
 
 // function parallels (x, y, numLines, lineWidth, lineHeight, lineSpacing) { // x and y parameters are defined in the function above.
 //   // let x = 50;
