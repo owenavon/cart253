@@ -23,22 +23,25 @@
 //   size: 64
 // }
 
-// let circle = {
-//   x: 0,
-//   y: 250,
-//   size: 100,
-//   vx: 0,
-//   vy: 0,
-//   speed: 2
-// };
+let circle = {
+  x: 250,
+  y: 250,
+  size: 100,
+  vx: 0,
+  vy: 0,
+  speed: 2
+};
 //
 // let state = `title`; // Possible states are: title, animation, ending.
 
-let bg = 0;
+// let bg = 0;
 
 // Description of setup()
 function setup() {
   createCanvas(500, 500);
+
+  circle.vx = circle.speed;
+  circle.vy = circle.speed;
 
   // circle.vx = circle.speed;
   // textSize(32);
@@ -53,12 +56,41 @@ function setup() {
 
 // Description of draw()
 function draw() {
-  background(bg);
+  background(0);
 
-  if (keyIsDown(65)) {
-    rectMode(CENTER);
-    rect(250, 250, 100, 100);
+  let dx = circle.x - mouseX;
+  let dy = circle.y - mouseY;
+
+  if (dx < 0) {
+    circle.vx = -circle.speed;
   }
+  else if (dx > 0) {
+    circle.vx = circle.speed;
+  }
+
+  if (dy < 0) {
+    circle.vy = -circle.speed;
+  }
+
+  else if (dy > 0) {
+    circle.vy = circle.speed;
+  }
+
+  // let change = random(); // Numbers from random are uniform.
+  // if (change < 0.1) {
+  //   circle.vx = random(-circle.speed, circle.speed);
+  //   circle.vy = random(-circle.speed, circle.speed);
+  // }
+
+  circle.x = circle.x + circle.vx;
+  circle.y = circle.y + circle.vy;
+
+  ellipse(circle.x, circle.y, circle.size);
+
+  // if (keyIsDown(65)) {
+  //   rectMode(CENTER);
+  //   rect(250, 250, 100, 100);
+  // }
 
   // textAlign(CENTER, CENTER);
   // textSize(64);
