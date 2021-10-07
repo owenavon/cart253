@@ -11,7 +11,7 @@
 
 let circle1 = {
   x: undefined,
-  y: 250,
+  y: 425,
   size: 100,
   vx: 0,
   vy: 0,
@@ -26,15 +26,12 @@ let circle2 = {
   maxSize: 125,
   vx: 0,
   vy: 0,
-  ax: 0,
-  ay: 0,
-  acceleration: 0.1,
-  minSpeed: 1,
-  maxSpeed: 10,
-  speed: 2
+  speed: 5,
+  tx: 0,
+  ty: 10
 };
 
-let timer = 10
+let timer = 15
 
 let state = `title`; // Can be: title, simulation, louser, winner, safety
 
@@ -75,9 +72,9 @@ function draw() {
     winner ();
   }
 
-  // else if (state === `safety`) {
-  //   safety ();
-  // }
+  else if (state === `safety`) {
+    safety ();
+  }
 }
 
 function title () {
@@ -92,7 +89,7 @@ function title () {
 
 function simulation () {
   circleOneControl();
-  circleTwoControl();
+  circleTwoMovement();
   gameTimer();
   checkOverlap();
   display();
@@ -116,6 +113,15 @@ function winner () {
   pop();
 }
 
+function safety () {
+  push();
+  textSize(30);
+  fill(255, 150, 150);
+  textAlign(CENTER,CENTER);
+  text(`Hmm!`, keyCode, width / 2, height / 2);
+  pop();
+}
+
 function circleOneControl () {
   let dx = circle1.x - mouseX;
   let dy = circle1.y - mouseY;
@@ -133,52 +139,25 @@ function circleOneControl () {
     circle1.vy = circle1.speed;
   }
 
-  // Allows circle 1 to move
-  circle1.x = circle1.x + circle1.vx;
+  circle1.x = circle1.x + circle1.vx; // Allows circle 1 to move
   circle1.y = circle1.y + circle1.vy;
 
-  // Constrian for circle 1
-  circle1.x = constrain(circle1.x, 0, width);
+  circle1.x = constrain(circle1.x, 0, width); // Constrian for circle 1
   circle1.y = constrain(circle1.y, 0, height);
 }
 
-function circleTwoControl () {
-  if (circle2.x > width) {
-    circle2.vx = -circle2.vx;
-    circle2.ax = circle2.ax + -circle2.acceleration;
-    circle2.size = random(circle2.minSize, circle2.maxSize);
-  }
-  if (circle2.x < 0) {
-    circle2.vx = -circle2.vx;
-    circle2.ax = circle2.ax + circle2.acceleration;
-    circle2.size = random(circle2.minSize, circle2.maxSize);
-  }
-  if (circle2.y > height) {
-    circle2.vy = -circle2.vy;
-    circle2.ay = circle2.ay + -circle2.acceleration;
-    circle2.size = random(circle2.minSize, circle2.maxSize);
-  }
-  if (circle2.y < 0) {
-    circle2.vy = -circle2.vy;
-    circle2.ay = circle2.ay + circle2.acceleration;
-    circle2.size = random(circle2.minSize, circle2.maxSize);
-  }
+function circleTwoMovement () { // Allows circle2 to move in regards to noise
+  circle2.x = map(noise(circle2.tx), 0, 1, 0, width);
+  circle2.y = map(noise(circle2.ty), 0, 1, 0, height);
 
-  // Acceleration and constrian of circle 2
-  circle2.vx = circle2.vx + circle2.ax;
-  circle2.vx = constrain(circle2.vx, -circle2.maxSpeed, circle2.maxSpeed);
-  circle2.vy = circle2.vy + circle2.ay;
-  circle2.vy = constrain(circle2.vy, -circle2.maxSpeed, circle2.maxSpeed);
-
-  // Allows circle 2 to move
-  circle2.x = circle2.x + circle2.vx;
-  circle2.y = circle2.y + circle2.vy;
+  circle2.tx = circle2.tx + 0.05;
+  circle2.ty = circle2.ty + 0.05;
 }
 
 function gameTimer () { // REVIEW THIS and make a state arise
   push();
   textSize(100);
-  fill(200, 100, 100);
+  fill(255);
   text(timer, width/2, height/2);
   pop();
 
@@ -190,23 +169,6 @@ function gameTimer () { // REVIEW THIS and make a state arise
     state = `winner`;
   }
 }
-
-// function checkOffscreen () {
-//   // Check if the circles have gone off the screen
-//   if (isOffscreen(circle1) || isOffscreen(circle2)) {
-//     // SAD ENDING
-//     state = `sadness`;
-//   }
-// }
-//
-// function isOffscreen(circle) {
-//   if (circle.x < 0 || circle.x > width || circle.y < 0 || circle.y > height) {
-//     return true;
-//   }
-//   else {
-//     return false;
-//   }
-// }
 
 function checkOverlap () {
   // Check if the circles overlap
@@ -226,5 +188,8 @@ function display () {
 function keyPressed () {
   if (keyCode === 80 && state === `title`) {
     state = `simulation`;
+  }
+  else if (keyCode === 72 && state === `simulation`) {
+    state = `safety`;
   }
 }
