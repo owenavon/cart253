@@ -6,19 +6,18 @@
 
 //Plan
 
-
 "use strict";
 
-let circle1 = {
+let link = {
   x: undefined,
-  y: 425,
+  y: 700,
   size: 100,
   vx: 0,
   vy: 0,
-  speed: 4
+  speed: 5
 };
 
-let circle2 = {
+let zelda = {
   x: undefined,
   y: 250,
   size: 100,
@@ -28,35 +27,52 @@ let circle2 = {
   vy: 0,
   speed: 5,
   tx: 0,
-  ty: 10
+  ty: 10,
+  segmentSize: 100
 };
 
-let timer = 15
+let bgImages = {
+  grass: undefined,
+  space: undefined,
+  escape: undefined,
+  winner: undefined,
+}
 
-let state = `title`; // Can be: title, simulation, louser, winner, safety
+let characterImages = {
+  x: 0,
+  y: 0,
+  size: 125,
+  link: undefined,
+  zelda: undefined
+}
 
-// Description of setup()
+let eightBitFont;
+let timer = 20
+let state = `title`; // Can be: title, simulation, loser, winner, escape
+
+function preload() {
+  bgImages.grass = loadImage("assets/images/grass.png");
+  bgImages.space = loadImage("assets/images/space.gif");
+  bgImages.escape = loadImage("assets/images/escape.png");
+  bgImages.winner = loadImage("assets/images/winner.png");
+  characterImages.link = loadImage("assets/images/link.png");
+  characterImages.zelda = loadImage("assets/images/zelda.png");
+
+  eightBitFont = loadFont("assets/font/8-bit-pusab.ttf")
+}
+
 function setup() {
-  createCanvas(500, 500);
+  createCanvas(750, 750);
   setupCircles();
 }
 
 function setupCircles () {
   // Position circles sperated from one another.
-  circle1.x = width / 3;
-  circle2.x = 2 * width / 3;
-
-  // Start circles moving in a random direction.
-  circle1.vx = random (-circle1.speed, circle1.speed);
-  circle2.vx = random (-circle2.speed, circle2.speed);
-
-  circle1.vy = random (-circle1.speed, circle1.speed);
-  circle2.vy = random (-circle2.speed, circle2.speed);
+  link.x = width / 3;
+  zelda.x = 2 * width / 3;
 }
 
-// Description of draw()
 function draw() {
-  background (0);
 
   if (state === `title`) {
     title();
@@ -64,30 +80,33 @@ function draw() {
   else if (state === `simulation` ) {
     simulation ();
   }
-  else if (state === `louser`) {
-    louser ();
+  else if (state === `loser`) {
+    loser ();
   }
 
   else if (state === `winner`) {
     winner ();
   }
 
-  else if (state === `safety`) {
-    safety ();
+  else if (state === `escape`) {
+    escape ();
   }
 }
 
 function title () {
   push();
+  background(bgImages.space);
   textSize(30);
   fill(200, 100, 100);
-  textAlign(CENTER,CENTER);
-  text(`Stay away from the crazy lover!`, width / 2, height / 2.75);
-  text(`Press "P" to play!`, width / 2, height / 2);
+  textAlign(CENTER, CENTER);
+  textFont(eightBitFont);
+  text(`Can you avoid the enemy?`, width / 2, height / 2.75);
+  text(`Press "P" to play`, width / 2, height / 2);
   pop();
 }
 
 function simulation () {
+  background(bgImages.grass);
   circleOneControl();
   circleTwoMovement();
   gameTimer();
@@ -95,70 +114,86 @@ function simulation () {
   display();
 }
 
-function louser () {
+function loser () {
   push();
-  textSize(30);
-  fill(255, 150, 150);
-  textAlign(CENTER,CENTER);
-  text(`Caught by the crazy lover!`, keyCode, width / 2, height / 2);
+  background (0);
+  textSize(100);
+  fill(255, 0, 0);
+  textFont(eightBitFont);
+  textAlign(CENTER, CENTER);
+  text(`GAME OVER`, keyCode, width / 2.6, height / 1.15);
   pop();
 }
 
 function winner () {
   push();
-  textSize(30);
-  fill(255, 150, 150);
-  textAlign(CENTER,CENTER);
-  text(`You survived the Crazy Lover!`, keyCode, width / 2, height / 2);
+  background(bgImages.winner);
+  textSize(32);
+  fill(255);
+  textFont(eightBitFont);
+  textAlign(CENTER, CENTER);
+  text(`You've survived the enemy!`, keyCode, width / 2, height / 1.2);
   pop();
 }
 
-function safety () {
+function escape () {
   push();
-  textSize(30);
-  fill(255, 150, 150);
-  textAlign(CENTER,CENTER);
-  text(`Hmm!`, keyCode, width / 2, height / 2);
+  background(bgImages.escape);
+  fill(255);
+  textFont(eightBitFont);
+  textAlign(CENTER);
+  textSize(32);
+  text(`You've managed to flee`, keyCode, width / 5, height / 1.1);
   pop();
 }
 
 function circleOneControl () {
-  let dx = circle1.x - mouseX;
-  let dy = circle1.y - mouseY;
+  let dx = link.x - mouseX;
+  let dy = link.y - mouseY;
 
   if (dx < 0) {
-    circle1.vx = -circle1.speed;
+    link.vx = -link.speed;
   }
   else if (dx > 0) {
-    circle1.vx = circle1.speed;
+    link.vx = link.speed;
   }
   if (dy < 0) {
-    circle1.vy = -circle1.speed;
+    link.vy = -link.speed;
   }
   else if (dy > 0) {
-    circle1.vy = circle1.speed;
+    link.vy = link.speed;
   }
 
-  circle1.x = circle1.x + circle1.vx; // Allows circle 1 to move
-  circle1.y = circle1.y + circle1.vy;
+  link.x = link.x + link.vx; // Allows circle 1 to move
+  link.y = link.y + link.vy;
 
-  circle1.x = constrain(circle1.x, 0, width); // Constrian for circle 1
-  circle1.y = constrain(circle1.y, 0, height);
+  link.x = constrain(link.x, 0, 655); // Constrian for circle 1
+  link.y = constrain(link.y, 0, 680);
 }
 
-function circleTwoMovement () { // Allows circle2 to move in regards to noise
-  circle2.x = map(noise(circle2.tx), 0, 1, 0, width);
-  circle2.y = map(noise(circle2.ty), 0, 1, 0, height);
+function circleTwoMovement () { // Allows zelda to move in regards to noise
+  zelda.x = map(noise(zelda.tx), 0, 1, 0, width);
+  zelda.y = map(noise(zelda.ty), 0, 1, 0, height);
 
-  circle2.tx = circle2.tx + 0.05;
-  circle2.ty = circle2.ty + 0.05;
+  zelda.tx = zelda.tx + 0.02;
+  zelda.ty = zelda.ty + 0.02;
+
+  let x = zelda.x;
+  let numSegments = 5;
+
+  for (let i = 0; i < numSegments; i++) {
+    image(characterImages.zelda, x, zelda.y, zelda.segmentSize);
+    x = x + 75;
+  }
 }
 
 function gameTimer () { // REVIEW THIS and make a state arise
   push();
-  textSize(100);
   fill(255);
-  text(timer, width/2, height/2);
+  textFont(eightBitFont);
+  textAlign(CENTER, TOP);
+  textSize(64);
+  text(timer, width / 5, height / 5.5);
   pop();
 
   if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
@@ -170,26 +205,23 @@ function gameTimer () { // REVIEW THIS and make a state arise
   }
 }
 
-function checkOverlap () {
-  // Check if the circles overlap
-  let d = dist(circle1.x, circle1.y, circle2.x, circle2.y);
-  if (d < circle1.size / 2 + circle2.size / 2) {
-    // LOUSER ENDING
-    state = `louser`;
+function checkOverlap () {  // Check if the circles overlap
+  let d = dist(link.x, link.y, zelda.x, zelda.y);
+  if (d < link.size / 2 + zelda.size / 2) {
+    state = `loser`;
   }
 }
 
 function display () {
-  // Display the circles
-  ellipse(circle1.x, circle1.y, circle1.size);
-  ellipse(circle2.x, circle2.y, circle2.size);
+  image(characterImages.link, link.x, link.y, link.size); // Displays the link character
+  image(characterImages.zelda, zelda.x, zelda.y, zelda.size); // Displays the zelda character
 }
 
 function keyPressed () {
   if (keyCode === 80 && state === `title`) {
     state = `simulation`;
   }
-  else if (keyCode === 72 && state === `simulation`) {
-    state = `safety`;
+  else if (keyCode === 27 && state === `simulation`) {
+    state = `escape`;
   }
 }
