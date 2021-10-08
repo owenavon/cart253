@@ -228,6 +228,6 @@ function keyPressed () { // p5 function to perform action with keyboard input.
     state = `simulation`; // Runs the "simulation" state.
   }
   else if (keyCode === 27 && state === `simulation`) { // Says when the "ESC" key is pushed, and the state is in "simulation", switch to the "escape" state.
-    state = `escape`; // Runs the "simulation" state.
+    state = `escape`; // Runs the "escape" state.
   }
 }
