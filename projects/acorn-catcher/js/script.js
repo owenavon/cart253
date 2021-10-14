@@ -9,9 +9,9 @@
 let brownAcorn = {
   x: 250,
   y: 0,
-  size: 100,
+  size: 50,
   minSize: 50,
-  maxSize: 100,
+  maxSize: 75,
   vx: 0,
   vy: 0,
   minSpeed: 5,
@@ -27,9 +27,9 @@ let brownAcorn = {
 let redAcorn = {
   x: 300,
   y: 50,
-  size: 100,
+  size: 25,
   minSize: 25,
-  maxSize: 75,
+  maxSize: 50,
   vx: 0,
   vy: 0,
   minSpeed: 5,
@@ -45,7 +45,7 @@ let redAcorn = {
 let goldAcorn = {
   x: 350,
   y: 100,
-  size: 100,
+  size: 5,
   minSize: 5,
   maxSize: 25,
   vx: 0,
@@ -61,13 +61,15 @@ let goldAcorn = {
 };
 
 let basket = {
-  x: 250,
-  y: 250,
-  size: 100,
+  x: 375,
+  y: 720,
+  size: 75,
   ax: 0,
   ay: 0,
-  acceleration: 0,
-  speed: 5,
+  vx: 0,
+  vy: 0,
+  friction: 0.99,
+  maxSpeed: 20,
   fill: 200
 };
 
@@ -93,12 +95,32 @@ let fontSize = {
   large: 96
 };
 
-// let gameFont;
+let gameTitle = {
+  string: `Acorn Catcher`,
+  x: 375,
+  y: 0,
+  vx: 0,
+  vy: 2,
+}
+
+let gameStart = {
+  string: `Press "Enter" to play`,
+  x: 0,
+  y: 375,
+  vx: 2.5,
+  vy: 0,
+}
 
 let score = 0;
-
-let timer = 15 // Sets the timer's value.
+let timer = 25; // Sets the timer's value.
 let state = `landing`; // Can be: title, simulation, winner, loser
+let acornSFX;
+let retroFont;
+
+function preload () {
+  acornSFX = loadSound(`./assets/sounds/click.mp3`);
+  retroFont = loadFont("assets/fonts/Nintendo-DS-BIOS.ttf") // Preloads the custom downloaded font.
+}
 
 function setup () { // executes the lines of code contained inside its block.
   createCanvas (750, 750); // Sets the Canvas width and height.
@@ -123,9 +145,9 @@ function draw() { // Location where code is excuted.
   else if (state === `simulation` ) { // Indicates that when the state equates to "simulation", start said state.
     simulation ();
   }
-  // else if (state === `winner`) { // Indicates that when the state equates to "winner", start said state.
-  //   winner ();
-  // }
+  else if (state === `winner`) { // Indicates that when the state equates to "winner", start said state.
+    winner ();
+  }
   else if (state === `loser`) { // Indicates that when the state equates to "loser", start said state.
     loser ();
   }
@@ -134,13 +156,32 @@ function draw() { // Location where code is excuted.
 function landing () { // Location where code is excuted.
   push(); // Isolates code from using global properties.
   background(0); // Calls the background image.
-  textSize(fontSize.small); // Displays the font size as 32px.
-  fill(200, 100, 100); // Makes the font salmon in colour.
+  textSize(fontSize.medium); // Displays the font size as 32px.
+  fill(255); // Makes the font white in colour.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
-  // textFont(eightBitFont); // Changes the font from the default to a custom font.
-  text(`Acorn Catcher`, width / 2, height / 2.75); // Displays on screen text at desired location.
-  text(`Press "Enter" to play`, width / 2, height / 2); // Displays on screen text at desired location.
+  textFont(retroFont); // Changes the font from the default to a custom font.
+  text(gameTitle.string, gameTitle.x, gameTitle.y); // Displays the title of the game.
+  text(gameStart.string, gameStart.x, gameStart.y); // Displays what the user must press to start the game.
+  landingInstructions ();
   pop(); // Isolates code from using global properties.
+
+  gameTitle.y = gameTitle.y + gameTitle.vy
+  gameTitle.y = constrain(gameTitle.y, 0, 300); // Constrains the basket's y postion within the canvas.
+
+  gameStart.x = gameStart.x + gameStart.vx
+  gameStart.x = constrain(gameStart.x, 0, 375); // Constrains the basket's y postion within the canvas.
+}
+
+function landingInstructions() {
+  push();
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(255, 0, 0);
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  textFont(retroFont); // Changes the font from the default to a custom font.
+  text(`CONTROLS: Use the left and right arrow keys to move the basket.`, width / 2, 600);
+  text(`OBJECTIVE: Collect 500 acorn points within 25 seconds.`, width / 2, 640); // Displays on screen text at desired location.
+  text(`NOTE: Pay close atention to the size and colour of the accorns.`, width / 2, 680); // Displays on screen text at desired location.
+  pop();
 }
 
 function simulation () { // simulation state.
@@ -161,12 +202,25 @@ function simulation () { // simulation state.
 function winner () { // winner state.
   push(); // Isolates code from using global properties.
   background(0); // Calls the background image.
-  textSize(fontSize.small); // Displays the font size as 32px.
-  fill(255); // Makes the font white in colour.
-  // textFont(eightBitFont); // Changes the font from the default to a custom font.
+  textSize(fontSize.large); // Displays the font size as 32px.
+  fill(255, 255, 0); // Makes the font white in colour.
+  textFont(retroFont); // Changes the font from the default to a custom font.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
-  text(`You've survived the enemy!`, keyCode, width / 2, height / 1.2); // Displays on screen text at desired location.
+  winnerText();
+  translate(width / 2, height / 2);
+  rotate(radians(frameCount));
+  text(`Congratulations!`, 0,0);
   pop(); // Isolates code from using global properties.
+}
+
+function winnerText() {
+  push();
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(255);
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  textFont(retroFont); // Changes the font from the default to a custom font.
+  text(`You collected all of the acorns. What will you do with them?`, width / 2, 650); // Displays on screen text at desired location.
+  pop();
 }
 
 function loser () { // loser state.
@@ -174,17 +228,37 @@ function loser () { // loser state.
   background (0); // Sets the background to black in colour.
   textSize(fontSize.large); // Displays the font size as 100px.
   fill(255, 0, 0); // Makes the font red in colour.
-  // textFont(eightBitFont); // Changes the font from the default to a custom font.
+  textFont(retroFont); // Changes the font from the default to a custom font.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
-  text(`GAME OVER`, width / 2.6, height / 1.15); // Displays on screen text at desired location.
+  text(`GAME OVER`, width / 2, height / 2); // Displays on screen text at desired location.
   pop(); // Isolates code from using global properties.
 }
 
 function basketControl () {
+  basket.vx = basket.vx + basket.ax;
+  basket.vy = basket.vy + basket.vy;
 
-  basket.x = mouseX;
-  basket.y = mouseY;
+  basket.vx = basket.vx * basket.friction;
+  basket.vy = basket.vy * basket.friction;
 
+  basket.vx = constrain(basket.vx, -basket.maxSpeed, basket.maxSpeed);
+  basket.vy = constrain(basket.vy, -basket.maxSpeed, basket.maxSpeed);
+
+  basket.x = basket.x + basket.vx;
+  basket.y = basket.y + basket.vy;
+
+  basket.x = constrain(basket.x, 0, 750); // Constrains the basket's x postion within the canvas.
+  basket.y = constrain(basket.y, 0, 750); // Constrains the basket's y postion within the canvas.
+
+  if (keyIsDown(RIGHT_ARROW)) {
+    basket.ax = 0.1;
+  }
+  else if (keyIsDown(LEFT_ARROW)) {
+    basket.ax = -0.1;
+  }
+  else {
+    basket.ax = 0;
+  }
 }
 
 function brownAcornMovement () {
@@ -226,10 +300,11 @@ function goldAcornMovement () {
 function gameTimer () { // Creates a dynamic game clock.
   push(); // Isolates code from using global properties.
   fill(255); // Makes the font white in colour.
-  // textFont(eightBitFont); // Changes the font from the default to a custom font.
-  textAlign(CENTER, TOP); // Dictates the text alignment style.
+  textFont(retroFont); // Changes the font from the default to a custom font.
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
   textSize(fontSize.medium); // Displays the font size as 64px.
-  text(timer, width / 5, height / 5.5); // Displays on screen text at desired location.
+  text(`Time:`, 600, 50);
+  text(timer, 690, 50); // Displays on screen text at desired location.
   pop(); // Isolates code from using global properties.
 
   if (frameCount % 60 == 0 && timer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
@@ -243,33 +318,44 @@ function gameTimer () { // Creates a dynamic game clock.
 function scoreBoard () {
   push();
   fill(255);
-  textSize(25);
-  text(`score:`, 100, 100);
-  text(score, 100, 35);
+  textSize(fontSize.medium);
+  textFont(retroFont); // Changes the font from the default to a custom font.
+  text(`Score:`, 50, 75);
+  text(score, 190, 75);
   pop();
+
+  if (score >= 500) { // Stops when the timer hits zero, and...
+    state = `winner`; // Runs the loser state.
+  }
 }
 
 function brownAcornScore () {  // Checks to see if brown acorn is in the basket.
   let d = dist(basket.x, basket.y, brownAcorn.x, brownAcorn.y ); // Assigns a variable to basket and brown acorn in regards to distance.
   if (d < brownAcorn.size / 2 + basket.size / 2) { // Indicates the location of where the two characters will touch.
-    score = score + 5;
-    // noLoop();
+    score = score + 1;
+    if (!acornSFX.isPlaying()) {
+      acornSFX.play();
+    }
   }
 }
 
 function redAcornScore () {  // Checks to see if brown acorn is in the basket.
   let d = dist(basket.x, basket.y, redAcorn.x, redAcorn.y ); // Assigns a variable to basket and brown acorn in regards to distance.
   if (d < redAcorn.size / 2 + basket.size / 2) { // Indicates the location of where the two characters will touch.
-    score = score + 10;
-    // noLoop();
+    score = score + 5;
+    if (!acornSFX.isPlaying()) {
+      acornSFX.play();
+    }
   }
 }
 
 function goldAcornScore () {  // Checks to see if brown acorn is in the basket.
   let d = dist(basket.x, basket.y, goldAcorn.x, goldAcorn.y ); // Assigns a variable to basket and brown acorn in regards to distance.
   if (d < goldAcorn.size / 2 + basket.size / 2) { // Indicates the location of where the two characters will touch.
-    score = score + 15;
-    // noLoop();
+    score = score + 10;
+    if (!acornSFX.isPlaying()) {
+      acornSFX.play();
+    }
   }
 }
 
