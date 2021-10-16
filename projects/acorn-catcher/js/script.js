@@ -73,28 +73,6 @@ let basket = {
   fill: 200
 };
 
-// let bgImages = {
-//   landing: undefined,
-//   winner: undefined,
-//   loser: undefined,
-// };
-
-// let simulationGraphics = {
-//   x: 0,
-//   y: 0,
-//   size: 125,
-//   brownAcornImg: undefined,
-//   redAcornImg: undefined,
-//   goldAcornImg: undefined,
-//   basketImg: undefined,
-// };
-
-let fontSize = {
-  small: 32,
-  medium: 64,
-  large: 96
-};
-
 let gameTitle = {
   string: `Acorn Catcher`,
   x: 375,
@@ -111,15 +89,50 @@ let gameStart = {
   vy: 0,
 }
 
-let score = 0;
+let gameSound = {
+  simulationMusic: undefined,
+  winnerMusic: undefined,
+  winnerMusic: undefined,
+};
+
+let simulationGraphic = {
+  x: undefined,
+  y: undefined,
+  size: undefined,
+  brownAcorn: undefined,
+  redAcorn: undefined,
+  goldAcorn: undefined,
+  treeTop: undefined,
+  cloudScape: undefined
+  // basketImg: undefined,
+};
+
+let fontSize = {
+  small: 32,
+  medium: 64,
+  large: 96
+};
+
+let retroFont;
+let score = 0; // Starts the score board at "0".
 let timer = 25; // Sets the timer's value.
 let state = `landing`; // Can be: title, simulation, winner, loser
-let acornSFX;
-let retroFont;
+
 
 function preload () {
-  acornSFX = loadSound(`./assets/sounds/click.mp3`);
   retroFont = loadFont("assets/fonts/Nintendo-DS-BIOS.ttf") // Preloads the custom downloaded font.
+
+  simulationGraphic.treeTop = loadImage("assets/images/treeTop.png")
+  simulationGraphic.brownAcorn = loadImage("assets/images/brownAcorn.png")
+  simulationGraphic.redAcorn = loadImage("assets/images/redAcorn.png")
+  simulationGraphic.goldAcorn = loadImage("assets/images/goldAcorn.png")
+  simulationGraphic.cloudScape = loadImage("assets/images/cloudScape.png")
+
+
+  gameSound.acornSFX = loadSound(`./assets/sounds/click.mp3`);
+  gameSound.simulationMusic = loadSound(`./assets/sounds/simulationMusic.mp3`);
+  gameSound.winnerMusic = loadSound(`./assets/sounds/winnerMusic.mp3`);
+
 }
 
 function setup () { // executes the lines of code contained inside its block.
@@ -185,7 +198,8 @@ function landingInstructions() {
 }
 
 function simulation () { // simulation state.
-  background(125); // Calls the background image.
+  background(255); // Calls the background image.
+  image(simulationGraphic.cloudScape, 0, 0);
 
   basketControl();
   brownAcornMovement();
@@ -194,6 +208,10 @@ function simulation () { // simulation state.
   redAcornScore();
   goldAcornMovement();
   goldAcornScore();
+
+  imageMode(CENTER);
+  image(simulationGraphic.treeTop, width / 2, 125);
+
   gameTimer(); // Calls indciated custom function.
   scoreBoard(); // Calls indciated custom function.
   display(); // Calls indciated custom function.
@@ -299,7 +317,7 @@ function goldAcornMovement () {
 
 function gameTimer () { // Creates a dynamic game clock.
   push(); // Isolates code from using global properties.
-  fill(255); // Makes the font white in colour.
+  fill(0); // Makes the font white in colour.
   textFont(retroFont); // Changes the font from the default to a custom font.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
   textSize(fontSize.medium); // Displays the font size as 64px.
@@ -317,7 +335,7 @@ function gameTimer () { // Creates a dynamic game clock.
 
 function scoreBoard () {
   push();
-  fill(255);
+  fill(0);
   textSize(fontSize.medium);
   textFont(retroFont); // Changes the font from the default to a custom font.
   text(`Score:`, 50, 75);
@@ -326,6 +344,8 @@ function scoreBoard () {
 
   if (score >= 500) { // Stops when the timer hits zero, and...
     state = `winner`; // Runs the loser state.
+    gameSound.simulationMusic.stop();
+    gameSound.winnerMusic.play();
   }
 }
 
@@ -333,8 +353,8 @@ function brownAcornScore () {  // Checks to see if brown acorn is in the basket.
   let d = dist(basket.x, basket.y, brownAcorn.x, brownAcorn.y ); // Assigns a variable to basket and brown acorn in regards to distance.
   if (d < brownAcorn.size / 2 + basket.size / 2) { // Indicates the location of where the two characters will touch.
     score = score + 1;
-    if (!acornSFX.isPlaying()) {
-      acornSFX.play();
+    if (!gameSound.acornSFX.isPlaying()) {
+      gameSound.acornSFX.play();
     }
   }
 }
@@ -343,8 +363,8 @@ function redAcornScore () {  // Checks to see if brown acorn is in the basket.
   let d = dist(basket.x, basket.y, redAcorn.x, redAcorn.y ); // Assigns a variable to basket and brown acorn in regards to distance.
   if (d < redAcorn.size / 2 + basket.size / 2) { // Indicates the location of where the two characters will touch.
     score = score + 5;
-    if (!acornSFX.isPlaying()) {
-      acornSFX.play();
+    if (!gameSound.acornSFX.isPlaying()) {
+      gameSound.acornSFX.play();
     }
   }
 }
@@ -353,22 +373,30 @@ function goldAcornScore () {  // Checks to see if brown acorn is in the basket.
   let d = dist(basket.x, basket.y, goldAcorn.x, goldAcorn.y ); // Assigns a variable to basket and brown acorn in regards to distance.
   if (d < goldAcorn.size / 2 + basket.size / 2) { // Indicates the location of where the two characters will touch.
     score = score + 10;
-    if (!acornSFX.isPlaying()) {
-      acornSFX.play();
+    if (!gameSound.acornSFX.isPlaying()) {
+      gameSound.acornSFX.play();
     }
   }
 }
 
 function display () { // Displays the on screen characters.
 
-  fill(brownAcorn.fill.r, brownAcorn.fill.g, brownAcorn.fill.b);
-  ellipse(brownAcorn.x, brownAcorn.y, brownAcorn.size);
+  // fill(brownAcorn.fill.r, brownAcorn.fill.g, brownAcorn.fill.b);
+  // ellipse(brownAcorn.x, brownAcorn.y, brownAcorn.size);
 
-  fill(redAcorn.fill.r, redAcorn.fill.g, redAcorn.fill.b);
-  ellipse(redAcorn.x, redAcorn.y, redAcorn.size);
+  image(simulationGraphic.brownAcorn, brownAcorn.x, brownAcorn.y, brownAcorn.size);
 
-  fill(goldAcorn.fill.r, goldAcorn.fill.g, goldAcorn.fill.b);
-  ellipse(goldAcorn.x, goldAcorn.y, goldAcorn.size);
+  image(simulationGraphic.redAcorn, redAcorn.x, redAcorn.y, redAcorn.size);
+
+  image(simulationGraphic.goldAcorn, goldAcorn.x, goldAcorn.y, goldAcorn.size);
+
+
+
+  // fill(redAcorn.fill.r, redAcorn.fill.g, redAcorn.fill.b);
+  // ellipse(redAcorn.x, redAcorn.y, redAcorn.size);
+  //
+  // fill(goldAcorn.fill.r, goldAcorn.fill.g, goldAcorn.fill.b);
+  // ellipse(goldAcorn.x, goldAcorn.y, goldAcorn.size);
 
   fill(basket.fill);
   ellipse(basket.x, basket.y, basket.size); // Displays the Gold Acorn character.
@@ -377,5 +405,8 @@ function display () { // Displays the on screen characters.
 function keyPressed () { // p5 function to perform action with keyboard input.
   if (keyCode === 13 && state === `landing`) { // Says when the "P" key is pushed, and the state is in "title", switch to the "simulation" state.
     state = `simulation`; // Runs the "simulation" state.
+    if (!gameSound.simulationMusic.isPlaying()) {
+      gameSound.simulationMusic.play();
+    }
   }
 }
