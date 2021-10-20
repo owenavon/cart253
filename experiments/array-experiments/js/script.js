@@ -1,8 +1,8 @@
 
-// Experimenting with Arrays
+// Experimenting with "arrays"
 // Owen Avon
 
-// Learning and experimenting with arrays
+// Learning and experimenting with "arrays"
 
 "use strict";
 
