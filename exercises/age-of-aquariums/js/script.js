@@ -14,10 +14,10 @@
 "use strict";
 
 let school = [];
-let schoolSize = 10;
+let schoolSize = 25;
 
-let shiver = [];
-let shiverSize = 1;
+let safety = [];
+let safetyZone = 5;
 
 // Shark
 let shark = {
@@ -30,20 +30,22 @@ let shark = {
 }
 
 let gameTitle = {
-  string: `Acorn Catcher`,
+  string: `Hungry Shark`,
   x: 375,
-  y: 0,
-  vx: 0,
-  vy: 2,
+  y: 300,
 }
 
 let gameStart = {
-  string: `Press "Enter" to play`,
-  x: 0,
-  y: 375,
-  vx: 2.5,
-  vy: 0,
+  string: `"Click" to play`,
+  x: 375,
+  y: 400,
 }
+
+let fontSize = {
+  small: 32,
+  medium: 64,
+  large: 96
+};
 
 let score = 0; // Starts the score board at "0".
 let timer = 25; // Sets the timer's value.
@@ -52,6 +54,7 @@ let state = `landing`; // Provides the starting state. Can be "landing", "simula
 function setup() {
   createCanvas(750, 750);
   setupFish ();
+  setupSafety ();
 }
 
 function setupFish () {
@@ -74,6 +77,22 @@ function createFish (x, y) {
   return fish;
 }
 
+function setupSafety () {
+  for (let i = 0; i < safetyZone; i++) {
+    let safetyBubble = createSafety(random(0, width), random(0, height));
+    safety.push(safetyBubble);
+  }
+}
+
+function createSafety (x, y) {
+  let safetyBubble = {
+    x: x,
+    y: y,
+    size: 100,
+  }
+  return safetyBubble;
+}
+
 function draw() {
   if (state === `landing`) { // Indicates that when the state equates to "landing", start said state.
     landing();
@@ -92,7 +111,7 @@ function draw() {
 function landing () { // Main landing state code.
   push (); // Isolates code from using global properties.
   background (0); // Displays the background colour as black.
-  // textSize (fontSize.medium); // Displays the font size as 32px.
+  textSize (fontSize.medium); // Displays the font size as 32px.
   fill (255); // Makes the font white in colour.
   textAlign (CENTER, CENTER); // Dictates the text alignment style.
   // textFont (retroFont); // Changes the font from the default to a custom font.
@@ -104,25 +123,22 @@ function landing () { // Main landing state code.
 function simulation () { // simulation state.
   background(0); // Calls the background image.
 
-  controlShark();
-  displayShark(); // Calls indciated custom function.
+  generateShark(); // Calls indciated custom function.
+  generateFish();
+  generateSafety();
 
-  drawFish();
-
-  sharkEatFish();
-
-  gameTimer();
+  gameTimer ();
   scoreBoard ();
 }
 
 function winner () { // Main winner state code.
   push(); // Isolates code from using global properties.
   background (0); // Displays the background colour as black.
-  // textSize (fontSize.large); // Displays the font size as 32px.
+  textSize (fontSize.large); // Displays the font size as 32px.
   fill (255); // Makes the font yellow in colour.
   // textFont (retroFont); // Changes the font from the default to a custom font.
   textAlign (CENTER, CENTER); // Dictates the text alignment style.
-  winnerText (); // Calls the winnerText function to display the text.
+  // winnerText (); // Calls the winnerText function to display the text.
   text (`Congratulations!`, width / 2, height / 2); // // Displays on screen text the top left corner. It is then translated via the parameter above.
   pop (); // Isolates code from using global properties.
 }
@@ -130,12 +146,17 @@ function winner () { // Main winner state code.
 function loser () { // Main loser state code.
   push (); // Isolates code from using global properties.
   background (0); // Displays the background colour as black.
-  // textSize (fontSize.large); // Displays the font size as 100px.
+  textSize (fontSize.large); // Displays the font size as 100px.
   fill (255); // Makes the font red in colour.
   // textFont (retroFont); // Changes the font from the default to a custom font.
   textAlign (CENTER, CENTER); // Dictates the text alignment style.
   text (`GAME OVER`, width / 2, height / 2); // Displays on screen text at the center of the canvas
   pop (); // Isolates code from using global properties.
+}
+
+function generateShark () {
+  controlShark ();
+  displayShark ();
 }
 
 function controlShark () {
@@ -170,10 +191,11 @@ function displayShark () {
   pop();
 }
 
-function drawFish () {
+function generateFish () {
   for (let i = 0; i < school.length; i++ ) {
     moveFish(school[i]);
     displayFish(school[i]);
+    checkFish(school[i]);
   }
 }
 
@@ -201,48 +223,63 @@ function displayFish (fish) {
   }
 }
 
-function sharkEatFish (fish) {
+function checkFish (fish) {
   if (!fish.eaten) {
     let d = dist(shark.x, shark.y, fish.x, fish.y);
     if (d < shark.size / 2 + fish.size / 2) {
       fish.eaten = true;
+      score = score + 1;
       }
     }
   }
 
-function keyPressed () { // p5 function to perform action with keyboard input.
-  if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
-    state = `simulation`; // Runs the "simulation" state.
+  function generateSafety () {
+    for (let i = 0; i < safety.length; i++ ) {
+      displaySafety(safety[i]);
+    }
   }
-}
 
-function gameTimer () { // Main code for dynamic game clock.
-  push (); // Isolates code from using global properties.
-  // textSize (fontSize.medium); // Displays the font size as 64px.
-  fill (255); // Makes the font white in colour.
-  // textFont (retroFont); // Changes the font from the default to a custom font.
-  textAlign (CENTER, CENTER); // Dictates the text alignment style.
-  text (`Time:`, 600, 50); // Displays text at the top right of the canvas.
-  text (timer, 690, 50); // Displays dynamic timer result at the top right of the canvas.
-  pop (); // Isolates code from using global properties.
+  function displaySafety (safetyBubble) {
+    push();
+    fill(255, 255, 0);
+    noStroke();
+    ellipse(safetyBubble.x, safetyBubble.y, safetyBubble.size);
+    pop();
+  }
 
-  if (frameCount % 60 == 0 && timer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
-    timer --;
-  }
-  if (timer == 0) { // If the timer hits zero (0), then...
-    state = `loser`; // Run the loser state.
-  }
-}
+  function gameTimer () { // Main code for dynamic game clock.
+    push (); // Isolates code from using global properties.
+    textSize (fontSize.medium); // Displays the font size as 64px.
+    fill (255); // Makes the font white in colour.
+    // textFont (retroFont); // Changes the font from the default to a custom font.
+    textAlign (CENTER, CENTER); // Dictates the text alignment style.
+    text (`Time:`, 565, 50); // Displays text at the top right of the canvas.
+    text (timer, 690, 50); // Displays dynamic timer result at the top right of the canvas.
+    pop (); // Isolates code from using global properties.
 
-function scoreBoard () { // Main code for dynamic score board.
-  push (); // Isolates code from using global properties.
-  fill (255); // Makes the font black in colour.
-  // textSize (fontSize.medium); // Displays the font size as 64px.
-  // textFont (retroFont); // Changes the font from the default to a custom font.
-  text (`Score:`, 50, 75); // Displays text at the top left of the canvas.
-  text (score, 190, 75); // Displays dynamic score result at the top left of the canvas.
-  pop (); // Isolates code from using global properties.
-  if (score >= 500) { // If the score is equal to or greater then 500...
-    state = `winner`; // Runs the winner state.
+    if (frameCount % 60 == 0 && timer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
+      timer --;
+    }
+    if (timer == 0) { // If the timer hits zero (0), then...
+      state = `loser`; // Run the loser state.
+    }
   }
-}
+
+  function scoreBoard () { // Main code for dynamic score board.
+    push (); // Isolates code from using global properties.
+    fill (255); // Makes the font black in colour.
+    textSize (fontSize.medium); // Displays the font size as 64px.
+    // textFont (retroFont); // Changes the font from the default to a custom font.
+    text (`Score:`, 50, 75); // Displays text at the top left of the canvas.
+    text (score, 250, 75); // Displays dynamic score result at the top left of the canvas.
+    pop (); // Isolates code from using global properties.
+    if (score >= 10) { // If the score is equal to or greater then 500...
+      state = `winner`; // Runs the winner state.
+    }
+  }
+
+  function mousePressed () { // p5 function to perform action with keyboard input.
+    if (state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
+      state = `simulation`; // Runs the "simulation" state.
+    }
+  }
