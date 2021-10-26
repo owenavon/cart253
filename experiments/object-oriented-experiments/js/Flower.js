@@ -36,4 +36,12 @@ class Flower {
     pop();
   }
 
+  mousePressed() {
+    let d = dist(this.x, this.y, mouseX, mouseY);
+    if (d < this.size / 2 + this.petalThickness) {
+      this.stemLength = this.stemLength + 5; // Creates the impression that the flower grows.
+      this.y = this.y - 5; // Creates the impression that the flower grows.
+    }
+  }
+
 }
