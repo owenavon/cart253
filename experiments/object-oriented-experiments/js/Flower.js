@@ -1,11 +1,11 @@
 class Flower {
 
-  constructor() { // Functions inside of classes are Referred to as methods.
+  constructor(x, y, size, stemLength, petalColor) { // Functions inside of classes are Referred to as methods.
     // Position and size information
-    this.x = random(0, width); // Variable is called "this" Refers to current object.
-    this.y = random(0, height);
-    this.size = 50;
-    this.stemLength = 75;
+    this.x = x; // Variable is called "this" Refers to current object.
+    this.y = y;
+    this.size = size;
+    this.stemLength = stemLength;
     this.stemThickness = 10;
     this.petalThickness = 10;
     // Color information
@@ -14,11 +14,7 @@ class Flower {
       g: 150,
       b: 50
     };
-    this.petalColor = {
-      r: 200,
-      g: 50,
-      b: 50
-    };
+    this.petalColor = petalColor;
     this.centreColor = {
       r: 50,
       g: 0,
