@@ -8,8 +8,8 @@ class Ball {
     this.ax = 0;
     this.ay = 0;
     this.maxSpeed = 10;
-    this.size = 40;
-    this.active = true;
+    this.size = 50;
+    this.view = true;
   }
 
   gravity(force) {
@@ -26,8 +26,10 @@ class Ball {
     this.x = this.x + this.vx;
     this.y = this.y + this.vy;
 
+    this.x = constrain(this.x, 0, width); // Constrains the ball to the canvas width
+
     if (this.y - this.size / 2 > height) {
-      this.active = false;
+      this.view = false;
     }
   }
 
@@ -45,6 +47,34 @@ class Ball {
       this.ay = 0;
     }
   }
+
+  tryToTouchToken(token) {
+    let d = dist(this.x, this.y, token.x, token.y);
+    if (d < this.size / 2 + token.size / 2) {
+      token.disappear();
+    }
+  }
+
+  // stopGame() {
+  //   if (this.numBalls < 0) {
+  //     state = `loser`;
+  //   }
+  // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   display() {
     push();
