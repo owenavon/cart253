@@ -55,27 +55,6 @@ class Ball {
     }
   }
 
-  // stopGame() {
-  //   if (this.numBalls < 0) {
-  //     state = `loser`;
-  //   }
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   display() {
     push();
     fill(255, 50, 50);

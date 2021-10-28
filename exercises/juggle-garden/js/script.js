@@ -198,7 +198,32 @@ function generateBall() {
       }
     }
   }
-}
+
+  // A variable to count how many active balls we find
+  // this frame
+  let numActiveBalls = 0;
+  // Loop through all the balls in the array
+  for (let i = 0; i < balls.length; i++) {
+    // Store the current ball in a variable
+    let ball = balls[i];
+    // Only update the ball if it's active
+    if (ball.active) {
+      // Since this is active, add one to our count
+      numActiveBalls++;
+      // Apply gravity, move, bounce, and display
+      ball.gravity(gravityForce);
+      ball.move();
+      ball.bounce(paddle);
+      ball.display();
+    }
+  }
+
+  // If we counted ZERO active balls, then change state to loser.
+  if (numActiveBalls === 0) {
+   state = `loser`;
+    }
+  }
+
 
 function mousePressed() { // p5 function to perform action with mouse click.
   if (state === `landing`) { // Indicates that if the mouse is clicked in the "landing" state, switch to the "simulation" state.

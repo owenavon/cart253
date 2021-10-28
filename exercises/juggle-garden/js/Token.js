@@ -31,8 +31,5 @@ class Token {
     if (this.size <= 0) {
       this.view = false;
     }
-    else if (this.tokenAmount < 0) {
-      state = `winner`;
-    }
   }
 }
