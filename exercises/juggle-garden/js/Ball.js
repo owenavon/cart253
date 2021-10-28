@@ -1,6 +1,6 @@
 class Ball {
 
-  constructor(x, y) {
+  constructor(x, y, clickSFX) {
     this.x = x;
     this.y = y;
     this.vx = 0;
@@ -9,6 +9,7 @@ class Ball {
     this.ay = 0;
     this.maxSpeed = 10;
     this.size = 50;
+    this.clickSFX = clickSFX;
     this.view = true;
   }
 
@@ -45,6 +46,8 @@ class Ball {
 
       this.vy = -this.vy;
       this.ay = 0;
+
+      this.clickSFX.play();
     }
   }
 

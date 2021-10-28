@@ -14,16 +14,18 @@ let numBalls = 10;
 let tokens = [];
 let numTokens = 1;
 
+let clickSFX = undefined;
+
 let state = `landing`; // Provides the starting state. Can be "landing", "simulation", "winner", "loser".
 
 let gameTitle = {
-  string: `Paddle Ball`,
+  string: `Trampoline Token`,
   x: 375,
   y: 300,
 }
 
 let gameStart = {
-  string: `"Click" to play`,
+  string: `Press "Enter" to play`,
   x: 375,
   y: 375,
 }
@@ -47,6 +49,10 @@ let bgColour = {
   }
 };
 
+function preload() {
+  clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
+}
+
 // Description of setup()
 function setup() {
   createCanvas(750, 750);
@@ -56,7 +62,7 @@ function setup() {
   for (let i = 0; i < numBalls; i++) {
     let x = random(0, width);
     let y = random(-400, -100);
-    let ball = new Ball(x, y);
+    let ball = new Ball(x, y, clickSFX);
     balls.push(ball);
   }
 
@@ -181,52 +187,47 @@ function generateToken() {
 }
 
 function generateBall() {
-  for (let i = 0; i < balls.length; i++) {
-    let ball = balls[i];
+  let numActiveBalls = 0; // A variable to count how many active balls we find this frame
+  for (let i = 0; i < balls.length; i++) { // Store the current ball in a variable
+    let ball = balls[i]; // Store the current ball in a variable
     if (ball.view) {
-      ball.gravity(gravityForce);
-      ball.move();
-      ball.bounce(paddle);
-      ball.display();
-      // ball.stopGame();
+      numActiveBalls++; // Since this is active, add one to our count
+      ball.gravity(gravityForce); // Apply gravity, move, bounce, and display
+      ball.move(); // Apply move
+      ball.bounce(paddle); // Apply bounce
+      ball.display(); // Apply display
 
-      for (let j = 0; j < tokens.length; j++) {
-        let token = tokens[j];
-        if (token.view) {
-          ball.tryToTouchToken(token)
+        for (let j = 0; j < tokens.length; j++) {
+          let numActiveTokens = 0; // A variable to count how many active tokens we find this frame
+          let token = tokens[j];
+          if (token.view) {
+            numActiveTokens++; // Since this is active, add one to our count
+            ball.tryToTouchToken(token)
+          }
+
+        if (numActiveBalls === 0) { // If we count zero (0) active tokens, then change state to winner.
+         state = `loser`;
+        }
+        if (numActiveTokens === 0) { // If we counted zero (0) active balls, then change state to loser.
+         state = `winner`;
         }
       }
     }
   }
-
-  // A variable to count how many active balls we find
-  // this frame
-  let numActiveBalls = 0;
-  // Loop through all the balls in the array
-  for (let i = 0; i < balls.length; i++) {
-    // Store the current ball in a variable
-    let ball = balls[i];
-    // Only update the ball if it's active
-    if (ball.active) {
-      // Since this is active, add one to our count
-      numActiveBalls++;
-      // Apply gravity, move, bounce, and display
-      ball.gravity(gravityForce);
-      ball.move();
-      ball.bounce(paddle);
-      ball.display();
-    }
-  }
-
-  // If we counted ZERO active balls, then change state to loser.
-  if (numActiveBalls === 0) {
-   state = `loser`;
-    }
-  }
-
-
-function mousePressed() { // p5 function to perform action with mouse click.
-  if (state === `landing`) { // Indicates that if the mouse is clicked in the "landing" state, switch to the "simulation" state.
-    state = `simulation`; // Runs the "simulation" state.
-  }
 }
+
+
+
+
+  function mousePressed () { // Emergency Ball
+    let x = mouseX;
+    let y = mouseY;
+    let ball = new Ball(x, y, clickSFX);
+    balls.push(ball);
+  }
+
+  function keyPressed () { // p5 function to perform action with keyboard input.
+    if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
+      state = `simulation`; // Runs the "simulation" state.
+    }
+  }
