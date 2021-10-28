@@ -12,10 +12,10 @@
   let numBalls = 10;
 
   let tokens = [];
-  let numTokens = 1;
+  let numTokens = 5;
 
   let clickSFX = undefined;
-
+  let bouncyFont; // Defines custom font.
   let state = `landing`; // Provides the starting state. Can be "landing", "simulation", "winner", "loser".
 
   let gameTitle = {
@@ -51,6 +51,7 @@
 
   function preload() {
     clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
+    bouncyFont = loadFont ("assets/font/BOUNCY.ttf") // Preloads the custom downloaded font for efficient load times.
   }
 
   // Description of setup()
@@ -104,6 +105,7 @@
     textSize(fontSize.medium); // Displays the font size as 56px.
     fill(255); // Makes the font white in colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    textFont (bouncyFont); // Changes the font from the default to a custom font.
     text(gameTitle.string, gameTitle.x, gameTitle.y); // Displays the title of the game.
     text(gameStart.string, gameStart.x, gameStart.y); // Displays the text that dictates what the user must press to start the game.
     landingInstructions(); // Calls the landingInstructions function to display text with different formatting.
@@ -115,6 +117,7 @@
     textSize(fontSize.small); // Displays the font size as 28px.
     fill(bgColour.teal.r, bgColour.teal.g, bgColour.teal.b); // Displays the instructions in teel colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    textFont (bouncyFont); // Changes the font from the default to a custom font.
     text(`NOTE: Click to add emergency ball`, width / 2, 600); // Displays on screen text slighly lower then the title text.
     text(`OBJECTIVE: Collect all of the tokens by touching the ball`, width / 2, 640); // Displays on screen text slighly lower then the title text.
     text(`CONTROLS: Use the left and right arrow keys to navigate the trampoline.`, width / 2, 680); // Displays on screen near the bottom of the canvas.
@@ -137,6 +140,7 @@
     fill(255); // Makes the font white in colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
     winnerSubtext(); // Calls the winnerSubtext function to display text with different formatting.
+    textFont (bouncyFont); // Changes the font from the default to a custom font.
     text(`Congratulations`, width / 2, height / 2); // Displays on screen text at the center of the canvas.
     pop(); // Isolates code from using global properties.
   }
@@ -147,7 +151,8 @@
     textSize(fontSize.small); // Displays the font size as 28px.
     fill(255, 255, 0); // Makes the font yellow in colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
-    text(`You got all the tokens! Be proud.`, width / 2, height / 1.5); // Displays on screen text below the main title.
+    textFont (bouncyFont); // Changes the font from the default to a custom font.
+    text(`You've collected all the tokens! Be proud.`, width / 2, height / 1.5); // Displays on screen text below the main title.
     pop(); // Isolates code from using global properties.
   }
 
@@ -158,6 +163,7 @@
     fill(255); // Makes the font white in colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
     loserSubtext(); // Calls the loserSubtext function to display text with different formatting.
+    textFont (bouncyFont); // Changes the font from the default to a custom font.
     text(`GAME OVER`, width / 2, height / 2); // Displays on screen text at the center of the canvas.
     pop(); // Isolates code from using global properties.
   }
@@ -168,7 +174,8 @@
     textSize(fontSize.small); // Displays the font size as 32px.
     fill(255, 0, 0); // Makes the font red in colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
-    text(`To difficult for you?`, width / 2, height / 1.5); // Displays on screen text below the main title.
+    textFont (bouncyFont); // Changes the font from the default to a custom font.
+    text(`You didn't read the objective... did you?`, width / 2, height / 1.5); // Displays on screen text below the main title.
     pop(); // Isolates code from using global properties.
   }
 
@@ -219,7 +226,7 @@ function mousePressed () { // Emergency Ball
   let x = mouseX;
   let y = mouseY;
   let ball = new Ball(x, y, clickSFX);
-  balls.push(ball);
+    balls.push(ball);
 }
 
 function keyPressed () { // p5 function to perform action with keyboard input.

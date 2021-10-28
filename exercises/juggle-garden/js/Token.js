@@ -20,8 +20,7 @@ class Token {
     strokeWeight(this.tokenThickness);
     fill(this.centreColor.r, this.centreColor.g, this.centreColor.b);
     stroke(this.outerColor.r, this.outerColor.g, this.outerColor.b);
-    rectMode(CENTER);
-    rect(this.x, this.y, this.size);
+    ellipse(this.x, this.y, this.size);
     pop();
   }
 
