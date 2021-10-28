@@ -11,6 +11,9 @@
   let balls = [];
   let numBalls = 10;
 
+  let spawnBalls = [];
+  let numSpawnBalls = 1;
+
   let tokens = [];
   let numTokens = 5;
 
@@ -225,8 +228,12 @@
 function mousePressed () { // Emergency Ball
   let x = mouseX;
   let y = mouseY;
-  let ball = new Ball(x, y, clickSFX);
-    balls.push(ball);
+  // spawn only the balls that do not yet exist in the array until the array length reach the number of balls desired by numSpawnBalls
+  for (let i = spawnBalls.length; i < numSpawnBalls; i++) {
+    let ball = new Ball(x, y, clickSFX)
+    console.log (`test`);
+    spawnBalls.push(ball);
+  }
 }
 
 function keyPressed () { // p5 function to perform action with keyboard input.
