@@ -51,9 +51,7 @@ class Ball { // Creates a class that is called from script.js
       this.vy = -this.vy; // Prevents the ball from further accelerating after each bounce.
       this.ay = 0; // Provides the ball with a consistent acceleration after each bounce.
 
-      if (!this.clickSFX.isPlaying()) { // States that if the click sound effect is not playing, it will be played everytime a ball touches the paddle
-        this.clickSFX.play();
-      }
+      this.clickSFX.play(); // Sound effect will be played everytime a ball touches the paddle.
     }
   }
 
