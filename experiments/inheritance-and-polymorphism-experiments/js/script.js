@@ -8,6 +8,7 @@
 let vehicles = []; // Single array that contains all of the vehicles
 let numCars = 10;
 let numMotorcycles = 10;
+let numSportscars = 3;
 
 // Description of setup()
 function setup() {
@@ -24,6 +25,13 @@ function setup() {
     let y = random(0, height);
     let motorcycle = new Motorcycle(x, y);
     vehicles.push(motorcycle);
+  }
+
+  for (let i = 0; i < numSportscars; i++) {
+    let x = random(0, width);
+    let y = random(0, height);
+    let sportscar = new SportsCar(x, y);
+    vehicles.push(sportscar); // Array is the first section
   }
 }
 
