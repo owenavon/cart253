@@ -1,4 +1,4 @@
-class Vehicle {
+class Vehicle { // Super class
   constructor(x, y) {
     this.x = x;
     this.y = y;

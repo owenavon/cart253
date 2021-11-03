@@ -5,10 +5,8 @@
 
 "use strict";
 
-let cars = [];
+let vehicles = []; // Single array that contains all of the vehicles
 let numCars = 10;
-
-let motorcycles = [];
 let numMotorcycles = 10;
 
 // Description of setup()
@@ -18,14 +16,14 @@ function setup() {
     let x = random(0, width);
     let y = random(0, height);
     let car = new Car(x, y);
-    cars.push(car);
+    vehicles.push(car); // Array is the first section
   }
 
   for (let i = 0; i < numMotorcycles; i++) {
     let x = random(0, width);
     let y = random(0, height);
     let motorcycle = new Motorcycle(x, y);
-    motorcycles.push(motorcycle);
+    vehicles.push(motorcycle);
   }
 }
 
@@ -33,18 +31,11 @@ function setup() {
 function draw() {
   background(0);
 
-  for (let i = 0; i < cars.length; i++) {
-    let car = cars[i];
-    car.move(); // Found in the Vehicle class
-    car.wrap(); // Found in the Vehicle class
-    car.display(); // Found in the Car class
-  }
-
-  for (let i = 0; i < motorcycles.length; i++) {
-    let motorcycle = motorcycles[i];
-    motorcycle.move(); // Found in the Vehicle class
-    motorcycle.wrap(); // Found in the Vehicle class
-    motorcycle.display(); // Found in the Motorcycle class
+  for (let i = 0; i < vehicles.length; i++) {
+    let vehicle = vehicles[i];
+    vehicle.move();
+    vehicle.wrap();
+    vehicle.display();
   }
 }
 
