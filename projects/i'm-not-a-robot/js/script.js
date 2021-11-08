@@ -18,25 +18,25 @@ let gameFalseStart = {
 }
 
 let gameError = {
-  string: `Error`,
+  string: `Error 403`,
   x: 375,
   y: 375,
 }
 
-let gameIntroText = { // Creates custom object for main heading.
-  string: `You thought it would be that Easy? You must prove that you are infact human before proceeding.`,
+let gameIntroTextLine1 = { // Creates custom object for main heading.
+  string: `You thought it would be that Easy?`,
   x: 375,
   y: 300,
 }
 
-let gameInstructions = {
-  string: `When ready, start the tests, but beware that you must respond correclty, who there will be consequences.`,
-  x: 500,
-  y: 400,
+let gameIntroTextLine2 = { // Creates custom object for main heading.
+  string: `You must prove that you are human before proceeding...`,
+  x: 375,
+  y: 350,
 }
 
 let gameTitle = { // Creates custom object for main heading.
-  string: `i'm not a robot`,
+  string: `I'm not a robot`,
   x: 375,
   y: 300,
 }
@@ -45,6 +45,30 @@ let gameStart = { // Creates custom object for secondary heading.
   string: `Press "Enter" to play`,
   x: 375,
   y: 375,
+}
+
+let gameObjective = { // Creates custom object for secondary heading.
+  string: `OBJECTIVE: Complete the various tests to prove that you are human.`,
+  x: 375,
+  y: 600,
+}
+
+let gameControl = { // Creates custom object for secondary heading.
+  string: `CONTROLS: Vary dpending on test. Follow on screen instruction.`,
+  x: 375,
+  y: 640,
+}
+
+let gameNote = { // Creates custom object for secondary heading.
+  string: `NOTE: Wrong answers will have consequences.`,
+  x: 375,
+  y: 680,
+}
+
+let puzzleText = { // Creates custom object for secondary heading.
+  string: `Pick the correct answer`,
+  x: 375,
+  y: 100,
 }
 
 let gameSuccess = {
@@ -77,18 +101,42 @@ let fontSize = { // Creates custom object for various font sizes.
 
 let state = `falseStart`;
 let startInstructionVisible = false;
+let startLandingVisible = false;
+let startLandingTimer = 0;
 
-// let startButton = {
-//   x: undefined,
-//   y: undefined,
-//   size: undefined
-// };
+let startButton = {
+  x: undefined,
+  y: undefined,
+  size: 100,
+  fill: 255,
+  highLightFill: 128,
+  normalFill: 255,
+  disappear: false
+};
+
+let questionClick = {
+  x: undefined,
+  y: undefined,
+  size: 100,
+  disappear: false
+};
+
+let question = `What day comes after Monday?`;
+
+let answers = [
+  `Yes`,
+  `No`,
+  `Maybe`,
+  `Tuesday`
+];
+
+let chosenQuestion = `Click for question to appear.`;
 
 function setup () { // Executes the lines of code contained inside its block.
   createCanvas (750, 750); // Sets the Canvas width and height.
-  generateTokens();
+  generateRobotButton();
+  // generateTokens();
   delayVirus();
-  // generateRobotButton();
 }
 
 function generateTokens() { // Function called in setup.
@@ -107,17 +155,17 @@ function generateTokens() { // Function called in setup.
 }
 
 function delayVirus () {
-  setTimeout(showInstruction, 2000);
+  setTimeout(showInstruction, 3000);
 }
 
 function showInstruction () {
   startInstructionVisible = true;
 }
 
-// function generateRobotButton() {
-//   startButton.x = width / 2;
-//   startButton.y = height / 2;
-// }
+function generateRobotButton() {
+  startButton.x = width / 2;
+  startButton.y = height / 1.5;
+}
 
 function draw() { // Location where code is excuted.
   if (state === `falseStart`) {
@@ -132,9 +180,9 @@ function draw() { // Location where code is excuted.
   else if (state === `landing`) {
     landing ();
   }
-  // else if (state === `puzzle1`) {
-  //   puzzle1 ();
-  // }
+  else if (state === `puzzle1`) {
+    puzzle1 ();
+  }
   // else if (state === `puzzle2`) {
   //   puzzle2 ();
   // }
@@ -149,35 +197,57 @@ function draw() { // Location where code is excuted.
   // }
 }
 
+
+// FALSESTART STATE
 function falseStart() { // Main landing state code.
-  push(); // Isolates code from using global properties.
   background(0); // Displays the background colour as black.
+
+  push(); // Isolates code from using global properties.
   textSize(fontSize.medium); // Displays the font size as 32px.
   fill(255); // Makes the font white in colour.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
   text(gameFalseStart.string, gameFalseStart.x, gameFalseStart.y); // Displays the title of the game.
-  noStroke();
-  fill(255);
-
-  ellipse(50, 150, 250, 350);
-
-  // startButtonOverlap();
   pop(); // Isolates code from using global properties.
+
+  startButtonOverlap();
+  displayStartButton();
+  startButtonHighLight();
 }
 
-// function startButtonOverlap() {
-//   let d = dist(mouseX, mouseY, startButton.x, startButton.y);
-//   if (d < startButton.size / 2) {
-//     state = `error`;
-//   }
-//
-//   push();
-//   noStroke();
-//   fill(255);
-//   ellipse(startButton.x, startButton.y, startButton.size);
-//   pop();
-// }
+function startButtonHighLight() { // Highlight function for start button.
+  let d = dist(mouseX, mouseY, startButton.x, startButton.y);
+  if (d < startButton.size / 2) {
+    startButton.fill = startButton.highLightFill;
+    cursor(HAND);
+  }
+  else {
+    startButton.fill = startButton.normalFill;
+    cursor(ARROW);
+  }
+}
 
+function startButtonOverlap() {
+  let d = dist(mouseX, mouseY, startButton.x, startButton.y);
+  if (d < startButton.size / 2) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+function displayStartButton() {
+  if (!startButton.disappear) {
+  push();
+  noStroke();
+  fill(startButton.fill);
+  rectMode (CENTER);
+  rect(startButton.x, startButton.y, startButton.size);
+  pop();
+  }
+}
+
+// ERROR STATE
 function error() { // Main landing state code.
   push(); // Isolates code from using global properties.
   background(0); // Displays the background colour as black.
@@ -185,31 +255,10 @@ function error() { // Main landing state code.
   fill(255, 0, 0); // Makes the font white in colour.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
   text(gameError.string, gameError.x, gameError.y); // Displays the title of the game.
-  updateTokens();
+  cursor(ARROW);
+  // updateTokens();
   virus();
-  waitTime();
-  pop(); // Isolates code from using global properties.
-}
-
-function instructions () { // Main landing state code.
-  push(); // Isolates code from using global properties.
-  background(0); // Displays the background colour as black.
-  textSize(fontSize.small); // Displays the font size as 32px.
-  fill(255); // Makes the font white in colour.
-  textAlign(CENTER, CENTER); // Dictates the text alignment style.
-  text(gameIntroText.string, gameIntroText.x, gameIntroText.y); // Displays the title of the game.
-  text(gameInstructions.string, gameInstructions.x, gameInstructions.y); // Displays the text that dictates what the user must press to start the game.
-  pop(); // Isolates code from using global properties.
-}
-
-function landing () { // Main landing state code.
-  push(); // Isolates code from using global properties.
-  background(0); // Displays the background colour as black.
-  textSize(fontSize.medium); // Displays the font size as 32px.
-  fill(0, 255, 0); // Makes the font white in colour.
-  textAlign(CENTER, CENTER); // Dictates the text alignment style.
-  text(gameTitle.string, gameTitle.x, gameTitle.y); // Displays the title of the game.
-  text(gameStart.string, gameStart.x, gameStart.y); // Displays the text that dictates what the user must press to start the game.
+  errorWaitTime();
   pop(); // Isolates code from using global properties.
 }
 
@@ -225,18 +274,7 @@ function virus() {
   }
 }
 
-function updateTokens() { // Function that is called in simulation
-  let numActiveTokens = 0; // A variable to count how many active tokens we find this frame
-  for (let i = 0; i < tokens.length; i++) {
-    let token = tokens[i]; // Sets token variable to an Infinite  amount in the array.
-    if (token.view) { // Says, if the tokens are visble, do the following...
-      numActiveTokens++; // Since this is active, add one to our count.
-      token.display(); // links to the dispay class in Token.js
-    }
-  }
-}
-
-function waitTime() { // Main code for dynamic game clock.
+function errorWaitTime() { // Main code for dynamic game clock.
   if (frameCount % 60 == 0 && timer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
     timer --;
   }
@@ -245,26 +283,98 @@ function waitTime() { // Main code for dynamic game clock.
   }
 }
 
-// function mousePressed() {
-//   if (state === `falseStart`) {
-//     state = `error`;
-//   }
-// }
 
-// function mouseIsInsideBalloon(balloon) {
-//   // Calculate the distance between the mouse and the balloon
-//   let d = dist(mouseX, mouseY, balloon.x, balloon.y);
-//   // If it's inside the ballon return true, otherwise false
-//   if (d < balloon.size / 2) {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// }
+// INSTRUCTIONS STATE
+function instructions () { // Main landing state code.
+  background(0); // Displays the background colour as black.
 
+  push(); // Isolates code from using global properties.
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(255); // Makes the font white in colour.
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  text(gameIntroTextLine1.string, gameIntroTextLine1.x, gameIntroTextLine1.y); // Displays the title of the game.
+  text(gameIntroTextLine2.string, gameIntroTextLine2.x, gameIntroTextLine2.y); // Displays the text that dictates what the user must press to start the game.
+  pop(); // Isolates code from using global properties.
+
+  instructionsWaitTime();
+}
+
+
+// LANDING STATE
+function landing () { // Main landing state code.
+  background(0); // Displays the background colour as black.
+  displayLandingText();
+}
+
+function instructionsWaitTime() { // Main code for dynamic game clock.
+
+  startLandingTimer +=1;
+  if (startLandingTimer >= 300) {
+    state = `landing`;
+  }
+}
+
+function displayLandingText() {
+  push(); // Isolates code from using global properties.
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(0, 255, 0); // Makes the font white in colour.
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  text(gameTitle.string, gameTitle.x, gameTitle.y); // Displays the title of the game.
+  text(gameStart.string, gameStart.x, gameStart.y); // Displays the text that dictates what the user must press to start the game.
+  text(gameObjective.string, gameObjective.x, gameObjective.y); // Displays the text that dictates what the user must press to start the game.
+  text(gameControl.string, gameControl.x, gameControl.y); // Displays the text that dictates what the user must press to start the game.
+  text(gameNote.string, gameNote.x, gameNote.y); // Displays the text that dictates what the user must press to start the game.
+  pop(); // Isolates code from using global properties.
+}
 
 function keyPressed () { // p5 function to perform action with keyboard input.
   if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
     state = `puzzle1`; // Runs the "simulation" state.
   }
 }
+
+// PUZZLE1 STATE
+function puzzle1 () { // Main landing state code.
+  background(125); // Displays the background colour as black.
+
+  push(); // Isolates code from using global properties.
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(255); // Makes the font white in colour.
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  text(question, width / 2, height / 5);
+  text(chosenQuestion, width / 2, height / 2); // Displays the title of the game.
+  pop(); // Isolates code from using global properties.
+
+  questionMousePress();
+}
+
+function questionMousePress() {
+  if (!questionClick.disappear) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+// MOUSE PRESS FUNCTION
+function mousePressed() {
+  if (startButtonOverlap()) {
+    startButton.disappear = true;
+    state = `error`;
+  }
+  if (questionMousePress()) {
+    chosenQuestion = random(answers);
+  }
+}
+
+// function updateTokens() { // Function that is called in simulation
+//   let numActiveTokens = 0; // A variable to count how many active tokens we find this frame
+//   for (let i = 0; i < tokens.length; i++) {
+//     let token = tokens[i]; // Sets token variable to an Infinite  amount in the array.
+//     if (token.view) { // Says, if the tokens are visble, do the following...
+//       numActiveTokens++; // Since this is active, add one to our count.
+//       token.display(); // links to the dispay class in Token.js
+//     }
+//   }
+// }
