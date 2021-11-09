@@ -60,13 +60,13 @@ let gameControl = { // Creates custom object for secondary heading.
 }
 
 let gameNote = { // Creates custom object for secondary heading.
-  string: `NOTE: Wrong answers will have consequences.`,
+  string: `NOTE: Allow the web broswer to acess audio & video inputs for the full experience.`,
   x: 375,
   y: 680,
 }
 
-let puzzleText = { // Creates custom object for secondary heading.
-  string: `Pick the correct answer`,
+let audioPuzzleHeading = { // Creates custom object for secondary heading.
+  string: `Use your voice to navigate the car up the road. The louder you talk, the faster the car moves.`,
   x: 375,
   y: 100,
 }
@@ -114,27 +114,40 @@ let startButton = {
   disappear: false
 };
 
-let questionClick = {
-  x: undefined,
-  y: undefined,
-  size: 100,
-  disappear: false
+let mic;
+let audioCar = {
+  x: 0,
+  y: 0,
+  vx: 0,
+  vy: 0,
+  fill: 255,
+  size: 100
+  // image: undefined
 };
 
-let question = `What day comes after Monday?`;
+// let questionClick = {
+//   x: undefined,
+//   y: undefined,
+//   size: 100,
+//   disappear: false
+// };
 
-let answers = [
-  `Yes`,
-  `No`,
-  `Maybe`,
-  `Tuesday`
-];
-
-let chosenQuestion = `Click for question to appear.`;
+// let question = `What day comes after Monday?`;
+//
+// let answers = [
+//   `Yes`,
+//   `No`,
+//   `Maybe`,
+//   `Tuesday`
+// ];
+//
+// let chosenQuestion = `Click for question to appear.`;
 
 function setup () { // Executes the lines of code contained inside its block.
   createCanvas (750, 750); // Sets the Canvas width and height.
   generateRobotButton();
+  generateAudioinput();
+  generateAudioCar();
   // generateTokens();
   delayVirus();
 }
@@ -167,6 +180,16 @@ function generateRobotButton() {
   startButton.y = height / 1.5;
 }
 
+function generateAudioinput() {
+  mic = new p5.AudioIn();
+  mic.start();
+}
+
+function generateAudioCar() {
+  audioCar.x = width / 2;
+  audioCar.y = height / 1;
+}
+
 function draw() { // Location where code is excuted.
   if (state === `falseStart`) {
     falseStart();
@@ -180,14 +203,14 @@ function draw() { // Location where code is excuted.
   else if (state === `landing`) {
     landing ();
   }
-  else if (state === `puzzle1`) {
-    puzzle1 ();
+  else if (state === `audioPuzzle`) {
+    audioPuzzle ();
   }
-  // else if (state === `puzzle2`) {
-  //   puzzle2 ();
+  // else if (state === `ballPuzzle`) {
+  //   ballPuzzle ();
   // }
-  // else if (state === `puzzle3`) {
-  //   puzzle3 ();
+  // else if (state === `cameraPuzzle`) {
+  //   cmaeraPuzzle ();
   // }
   // else if (state === `winner`) {
   //   winner ();
@@ -329,31 +352,44 @@ function displayLandingText() {
 
 function keyPressed () { // p5 function to perform action with keyboard input.
   if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
-    state = `puzzle1`; // Runs the "simulation" state.
+    state = `audioPuzzle`; // Runs the "simulation" state.
   }
 }
 
-// PUZZLE1 STATE
-function puzzle1 () { // Main landing state code.
+// audioPuzzle STATE
+function audioPuzzle () { // Main landing state code.
   background(125); // Displays the background colour as black.
-
-  push(); // Isolates code from using global properties.
-  textSize(fontSize.small); // Displays the font size as 32px.
-  fill(255); // Makes the font white in colour.
-  textAlign(CENTER, CENTER); // Dictates the text alignment style.
-  text(question, width / 2, height / 5);
-  text(chosenQuestion, width / 2, height / 2); // Displays the title of the game.
-  pop(); // Isolates code from using global properties.
-
-  questionMousePress();
+  audioPuzzleText();
+  audiovisualization();
 }
 
-function questionMousePress() {
-  if (!questionClick.disappear) {
-    return true;
-  } else {
-    return false;
+function audioPuzzleText () {
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(0); // Makes the font white in colour.
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  text(audioPuzzleHeading.string, audioPuzzleHeading.x, audioPuzzleHeading.y);
+}
+
+function audiovisualization() {
+  let level = mic.getLevel(); // Get microphone volume
+
+  if (level >= 0.2) { // Check if the car will move
+    audioCar.vy = 5; // Exit at canvas top
+    if (level <= 0.2) {
+      audioCar.vy = 0;
+    }
   }
+
+  // Move the car
+  audioCar.x = audioCar.x - audioCar.vx;
+  audioCar.y = audioCar.y - audioCar.vy;
+
+  // Display the ghost
+  push();
+  noStroke();
+  fill(audioCar.fill);
+  ellipse(audioCar.x, audioCar.y, audioCar.size);
+  pop();
 }
 
 
@@ -363,9 +399,9 @@ function mousePressed() {
     startButton.disappear = true;
     state = `error`;
   }
-  if (questionMousePress()) {
-    chosenQuestion = random(answers);
-  }
+  // if (questionMousePress()) {
+  //   chosenQuestion = random(answers);
+  // }
 }
 
 // function updateTokens() { // Function that is called in simulation
