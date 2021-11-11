@@ -7,9 +7,19 @@
 
 "use strict";
 
-let tokens = []; // Creates an array named tokens.
-let numTokens = 50; // Provides a dynamic number of instances inside the array.
-let timer = 5; // Sets the timer's value.
+let audioCar;
+let potholes = [];
+
+let addPotholeInterval = 1 * 75; // How often to add a new vehicle (in frames). One every second The timer that will count down to 0 so we'll know when to add a new vehicle
+let audioPuzzletimer = addPotholeInterval;
+
+let state = `falseStart`;
+let startInstructionVisible = false;
+let startLandingVisible = false;
+let startLandingTimer = 0;
+
+let mic;
+let autoTimer = 5; // Sets the timer's value.
 
 let gameFalseStart = {
   string: `I'm not a Robot`,
@@ -48,13 +58,13 @@ let gameStart = { // Creates custom object for secondary heading.
 }
 
 let gameObjective = { // Creates custom object for secondary heading.
-  string: `OBJECTIVE: Complete the various tests to prove that you are human.`,
+  string: `OBJECTIVE: Complete the various puzzles to prove that you are human.`,
   x: 375,
   y: 600,
 }
 
 let gameControl = { // Creates custom object for secondary heading.
-  string: `CONTROLS: Vary dpending on test. Follow on screen instruction.`,
+  string: `CONTROLS: Vary dpending on puzzles. Follow on screen instruction.`,
   x: 375,
   y: 640,
 }
@@ -66,7 +76,31 @@ let gameNote = { // Creates custom object for secondary heading.
 }
 
 let audioPuzzleHeading = { // Creates custom object for secondary heading.
-  string: `Use your voice to navigate the car up the road. The louder you talk, the faster the car moves.`,
+  string: `Navigate the car up the road with your voice.`,
+  x: 375,
+  y: 100,
+}
+
+let audioPuzzleSubHeading = { // Creates custom object for secondary heading.
+  string: `The louder you talk, the faster the car moves. Avoid potholes at all costs.`,
+  x: 375,
+  y: 125,
+}
+
+let ballPuzzleHeading = { // Creates custom object for secondary heading.
+  string: `Very good... Now you must successfully collect all the tokens.`,
+  x: 375,
+  y: 100,
+}
+
+let ballPuzzleSubHeading = { // Creates custom object for secondary heading.
+  string: `Aw, Shucks... You've reached the end of the prototype.`,
+  x: 375,
+  y: 200,
+}
+
+let cameraPuzzleHeading = { // Creates custom object for secondary heading.
+  string: `Hmm, you're starting to appear as human... One more test.`,
   x: 375,
   y: 100,
 }
@@ -99,11 +133,6 @@ let fontSize = { // Creates custom object for various font sizes.
   large: 96
 };
 
-let state = `falseStart`;
-let startInstructionVisible = false;
-let startLandingVisible = false;
-let startLandingTimer = 0;
-
 let startButton = {
   x: undefined,
   y: undefined,
@@ -114,57 +143,12 @@ let startButton = {
   disappear: false
 };
 
-let mic;
-let audioCar = {
-  x: 0,
-  y: 0,
-  vx: 0,
-  vy: 0,
-  fill: 255,
-  size: 100
-  // image: undefined
-};
-
-// let questionClick = {
-//   x: undefined,
-//   y: undefined,
-//   size: 100,
-//   disappear: false
-// };
-
-// let question = `What day comes after Monday?`;
-//
-// let answers = [
-//   `Yes`,
-//   `No`,
-//   `Maybe`,
-//   `Tuesday`
-// ];
-//
-// let chosenQuestion = `Click for question to appear.`;
-
 function setup () { // Executes the lines of code contained inside its block.
   createCanvas (750, 750); // Sets the Canvas width and height.
   generateRobotButton();
   generateAudioinput();
-  generateAudioCar();
-  // generateTokens();
   delayVirus();
-}
-
-function generateTokens() { // Function called in setup.
-  for (let i = 0; i < numTokens; i++) { // Create our Tokens by counting up to the number of the Tokens.
-    let horizontal = random(0, width); // Set a random x position.
-    let vertical = random(100, 650); // set a random y postion.
-    let tokenSize = random(25, 50); // set a random size.
-    let color = { // Provide a colour to the inside of the token.
-      r: 255,
-      g: 255,
-      b: 0
-    };
-    let token = new Virus(horizontal, vertical, tokenSize, color); // Calls class and sets parameters
-    tokens.push(token); // Adds the token to the array of tokens.
-  }
+  generateAudioCar();
 }
 
 function delayVirus () {
@@ -186,8 +170,9 @@ function generateAudioinput() {
 }
 
 function generateAudioCar() {
-  audioCar.x = width / 2;
-  audioCar.y = height / 1;
+  let x = width / 2;
+  let y = height;
+  audioCar = new AudioCar(x, y);
 }
 
 function draw() { // Location where code is excuted.
@@ -198,26 +183,26 @@ function draw() { // Location where code is excuted.
     error();
   }
   else if (state === `instructions`) {
-    instructions ();
+    instructions();
   }
   else if (state === `landing`) {
-    landing ();
+    landing();
   }
   else if (state === `audioPuzzle`) {
-    audioPuzzle ();
+    audioPuzzle();
   }
-  // else if (state === `ballPuzzle`) {
-  //   ballPuzzle ();
-  // }
+  else if (state === `ballPuzzle`) {
+    ballPuzzle();
+  }
   // else if (state === `cameraPuzzle`) {
   //   cmaeraPuzzle ();
   // }
   // else if (state === `winner`) {
   //   winner ();
   // }
-  // else if (state === `loser`) {
-  //   loser ();
-  // }
+  else if (state === `loser`) {
+    loser ();
+  }
 }
 
 
@@ -279,7 +264,6 @@ function error() { // Main landing state code.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
   text(gameError.string, gameError.x, gameError.y); // Displays the title of the game.
   cursor(ARROW);
-  // updateTokens();
   virus();
   errorWaitTime();
   pop(); // Isolates code from using global properties.
@@ -298,10 +282,10 @@ function virus() {
 }
 
 function errorWaitTime() { // Main code for dynamic game clock.
-  if (frameCount % 60 == 0 && timer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
-    timer --;
+  if (frameCount % 60 == 0 && autoTimer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
+    autoTimer --;
   }
-  if (timer == 0 && state === `error` ) { // If the timer hits zero (0), then...
+  if (autoTimer == 0 && state === `error` ) { // If the timer hits zero (0), then...
     state = `instructions`; // Run the loser state.
   }
 }
@@ -359,8 +343,11 @@ function keyPressed () { // p5 function to perform action with keyboard input.
 // audioPuzzle STATE
 function audioPuzzle () { // Main landing state code.
   background(125); // Displays the background colour as black.
+
   audioPuzzleText();
-  audiovisualization();
+  audioCarResources();
+  audioPotholeTimer();
+  audioPotholeStates();
 }
 
 function audioPuzzleText () {
@@ -368,30 +355,88 @@ function audioPuzzleText () {
   fill(0); // Makes the font white in colour.
   textAlign(CENTER, CENTER); // Dictates the text alignment style.
   text(audioPuzzleHeading.string, audioPuzzleHeading.x, audioPuzzleHeading.y);
+  text(audioPuzzleSubHeading.string, audioPuzzleSubHeading.x, audioPuzzleSubHeading.y);
 }
 
-function audiovisualization() {
-  let level = mic.getLevel(); // Get microphone volume
+function audioCarResources() {
+  audioCar.handleInput();
+  audioCar.move();
+  audioCar.display();
+}
 
-  if (level >= 0.2) { // Check if the car will move
-    audioCar.vy = 5; // Exit at canvas top
-    if (level <= 0.2) {
-      audioCar.vy = 0;
+function audioPotholeTimer() {
+  audioPuzzletimer -= 0.5; // Update our timer by counting down half a frame
+
+  if (audioPuzzletimer <= 0) { // Check if our timer hit zero
+    let y = random(0, 600);// Choose a random y position
+    let r = random(0, 1);// Generate a random number for probability
+    let pothole = undefined; // We're going to randomly create a vehicle in this variable
+
+    if (r < 0.5) { // Use comparisons with r to randomly create one of two types of potholes
+      pothole = new CanadianPothole(0, y);// Always create them at an x of 0 so they start on one side of the screen
     }
+    else {
+      pothole = new AmericanPothole(0, y);
+    }
+
+    r = random(0, 1); // Generate another random number to control which direction the new potholes will move in
+    if (r < 0.1) { // Half the time left and half the time right. We also multiply the speed by a random number so that there's some variance between different
+      pothole.vx = -pothole.speed * random(0.5, 0.7);
+    } else {
+      pothole.vx = pothole.speed * random(0.5, 0.7);
+    }
+
+    potholes.push(pothole); // Add our new potholes to the simulation by adding it to the array
+    audioPuzzletimer = addPotholeInterval; // Reset timer
+  }
+}
+
+function audioPotholeStates() {
+  // Go through all the vehicles currently in the simulation
+  for (let i = 0; i < potholes.length; i++) {
+    let pothole = potholes[i];
+    // Call its basic methods
+    pothole.move();
+    pothole.wrap();
+    pothole.display();
+
+    audioCar.checkHit(pothole); // Check whether the audioCar hit the pothole
   }
 
-  // Move the car
-  audioCar.x = audioCar.x - audioCar.vx;
-  audioCar.y = audioCar.y - audioCar.vy;
+  if (!audioCar.alive) { // If the audioCar hits a pothole, go to loser state
+    state = `loser`;
+  }
 
-  // Display the ghost
-  push();
-  noStroke();
-  fill(audioCar.fill);
-  ellipse(audioCar.x, audioCar.y, audioCar.size);
-  pop();
+  if (audioCar.y < 0) { // If the audioCar makes it past the top of the canvas then switch to the ballPuzzle state.
+    state = `ballPuzzle`;
+  }
 }
 
+
+// ballPuzzle STATE
+function ballPuzzle () { // Main landing state code.
+  background(50); // Displays the background colour as black.
+
+  push(); // Isolates code from using global properties.
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(255); // Makes the font white in colour.
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  text(ballPuzzleHeading.string, ballPuzzleHeading.x, ballPuzzleHeading.y); // Displays the title of the game.
+  text(ballPuzzleSubHeading.string, ballPuzzleSubHeading.x, ballPuzzleSubHeading.y); // Displays the title of the game.
+  pop(); // Isolates code from using global properties.
+}
+
+
+// LOSER STATE
+function loser() { // Main landing state code.
+  push(); // Isolates code from using global properties.
+  background(0); // Displays the background colour as black.
+  textSize(fontSize.small); // Displays the font size as 32px.
+  fill(255, 0, 0); // Makes the red white in colour.
+  textAlign(CENTER, CENTER); // Dictates the text alignment style.
+  text(gameFail.string, gameFail.x, gameFail.y); // Displays the title of the game.
+  pop(); // Isolates code from using global properties.
+}
 
 // MOUSE PRESS FUNCTION
 function mousePressed() {
@@ -399,18 +444,4 @@ function mousePressed() {
     startButton.disappear = true;
     state = `error`;
   }
-  // if (questionMousePress()) {
-  //   chosenQuestion = random(answers);
-  // }
 }
-
-// function updateTokens() { // Function that is called in simulation
-//   let numActiveTokens = 0; // A variable to count how many active tokens we find this frame
-//   for (let i = 0; i < tokens.length; i++) {
-//     let token = tokens[i]; // Sets token variable to an Infinite  amount in the array.
-//     if (token.view) { // Says, if the tokens are visble, do the following...
-//       numActiveTokens++; // Since this is active, add one to our count.
-//       token.display(); // links to the dispay class in Token.js
-//     }
-//   }
-// }
