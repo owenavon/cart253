@@ -245,6 +245,12 @@
     else if (state === `cameraPuzzle`) {
       cameraPuzzle ();
     }
+    // else if (state === `cameraFlash`) {
+    //   cameraFlash ();
+    // }
+    // else if (state === `finalCheck`) {
+    //   finalCheck ();
+    // }
     // else if (state === `winner`) {
     //   winner ();
     // }
