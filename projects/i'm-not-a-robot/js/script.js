@@ -7,7 +7,7 @@
 
   "use strict";
 
-  let state = `falseStart`; // Starting state of program
+  let state = `ballPuzzle`; // Starting state of program
 
   let video; // User's webcam
   let modelName = `CocoSsd`; // The name of our model
@@ -237,12 +237,12 @@
       video = createCapture(VIDEO); // Start the CocoSsd model and when it's ready start detection
       video.hide(); // and switch to the running state
 
-      cocossd = ml5.objectDetector('cocossd', {}, function() { // Ask CocoSsd to start detecting objects, calls gotResults if it finds something
-      cocossd.detect(video, gotResults);
-      state = `cameraPuzzle`; // Switch to the cameraPuzzle state
-    });
+        cocossd = ml5.objectDetector('cocossd', {}, function() { // Ask CocoSsd to start detecting objects, calls gotResults if it finds something
+        cocossd.detect(video, gotResults);
+        state = `cameraPuzzle`; // Switch to the cameraPuzzle state
+      });
+    }
   }
-}
 
 
   /**
@@ -574,28 +574,28 @@
   }
 
   function updateBall() { // Function that is called in simulation
-   let numActiveBalls = 0; // A variable to count how many active balls we find this frame
-   for (let i = 0; i < balls.length; i++) { // Store the current ball in a variable
-     let ball = balls[i]; // sets the ball variable to the balls array.
-     if (ball.view) { // Says, if the ball is visble, do the following...
-       numActiveBalls++; // Since this is active, add one to our count
-       ball.gravity(gravityForce); // Apply gravity, move, bounce, and display. Called in Ball.js
-       ball.move(); // Apply move. Called in Ball.js
-       ball.bounce(paddle); // Apply bounce. Called in Ball.js
-       ball.display(); // Apply display. Called in Ball.js
+    let numActiveBalls = 0; // A variable to count how many active balls we find this frame
+    for (let i = 0; i < balls.length; i++) { // Store the current ball in a variable
+       let ball = balls[i]; // sets the ball variable to the balls array.
+       if (ball.view) { // Says, if the ball is visble, do the following...
+         numActiveBalls++; // Since this is active, add one to our count
+         ball.gravity(gravityForce); // Apply gravity, move, bounce, and display. Called in Ball.js
+         ball.move(); // Apply move. Called in Ball.js
+         ball.bounce(paddle); // Apply bounce. Called in Ball.js
+         ball.display(); // Apply display. Called in Ball.js
 
-       for (let j = 0; j < tokens.length; j++) {
-         let token = tokens[j]; // Sets the token variable to the tokens array.
-         if (token.view) { // Says, if the tokens are visble, do the following...
-           ball.tryToTouchToken(token) // runs function to check overlap. Called in Token.js
+         for (let j = 0; j < tokens.length; j++) {
+           let token = tokens[j]; // Sets the token variable to the tokens array.
+           if (token.view) { // Says, if the tokens are visble, do the following...
+             ball.tryToTouchToken(token) // runs function to check overlap. Called in Token.js
+           }
          }
        }
      }
-   }
-   if (numActiveBalls === 0) { // If we counted zero (0) active balls, then change state to loser.
-     state = `loser`; // Swaps to loser state.
+     if (numActiveBalls === 0) { // If we counted zero (0) active balls, then change state to loser.
+       state = `loser`; // Swaps to loser state.
+    }
   }
-}
 
   // cameraPuzzleLoad STATE
   function cameraPuzzleLoad() {
@@ -632,28 +632,20 @@
   }
 
   function highlightObject(object) { // Provided with a detected object it draws a box around it and includes its label and confidence value
-
-    // Display a box around it
     push();
     noFill();
     stroke(255, 255, 0);
-    rect(object.x, object.y, object.width, object.height);
+    rect(object.x, object.y, object.width, object.height); // Display a box around it
     pop();
-    // Display the label and confidence in the center of the box
+
+
     push();
     textSize(fontSize.small); // Displays the font size as 18px.
     fill(255, 255, 0);
     textAlign(CENTER, CENTER);
-    text(`${object.label}, ${object.confidence.toFixed(2)}`, object.x + object.width / 2, object.y + object.height / 2);
+    text(`${object.label}, ${object.confidence.toFixed(2)}`, object.x + object.width / 2, object.y + object.height / 2);   // Display the label and confidence in the center of the box
     pop();
   }
-
-
-
-
-
-
-
 
 
   // LOSER STATE
@@ -667,9 +659,6 @@
     text(gameFail.string, gameFail.x, gameFail.y); // Displays the title of the game.
     pop(); // Isolates code from using global properties.
   }
-
-
-
 
 
   // MOUSE PRESS FUNCTION
