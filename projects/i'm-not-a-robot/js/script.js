@@ -7,6 +7,13 @@
 
   "use strict";
 
+  let state = `falseStart`; // Starting state of program
+
+  let video; // User's webcam
+  let modelName = `CocoSsd`; // The name of our model
+  let cocossd; // ObjectDetector object (using the name of the model for clarify)
+  let predictions = []; // The current set of predictions made by CocoSsd once it's running
+
   let gravityForce = 0.0025; // Assigns a numerical value to the variable gravityForce.
   let paddle; // defines paddle as a variable.
 
@@ -27,7 +34,6 @@
   let addPotholeInterval = 1 * 75; // How often to add a new vehicle (in frames). One every second The timer that will count down to 0 so we'll know when to add a new vehicle
   let audioPuzzletimer = addPotholeInterval;
 
-  let state = `falseStart`;
   let startInstructionVisible = false;
   let startLandingVisible = false;
   let startLandingTimer = 0;
@@ -113,7 +119,7 @@
     y: 150,
   }
 
-  let cameraPuzzleHeading = { // Creates custom object for secondary heading.
+  let cameraPuzzleLoadingHeading = { // Creates custom object for secondary heading.
     string: `Hmm, you're starting to appear as human... One more test.`,
     x: 375,
     y: 100,
@@ -142,6 +148,7 @@
   };
 
   let fontSize = { // Creates custom object for various font sizes.
+    vSmall: 12,
     small: 18,
     medium: 64,
     large: 96
@@ -173,6 +180,7 @@
     mousePressed();
     spawnInitialBalls(); // Function that is called to generate the first emergency ball.
 
+    webcamDetection();
   }
 
   function delayVirus () {
@@ -223,6 +231,34 @@
     }
   }
 
+  function webcamDetection() {
+    if (state === `cameraPuzzleLoad`) {
+      // Start webcam and hide the resulting HTML element
+      video = createCapture(VIDEO); // Start the CocoSsd model and when it's ready start detection
+      video.hide(); // and switch to the running state
+
+      cocossd = ml5.objectDetector('cocossd', {}, function() { // Ask CocoSsd to start detecting objects, calls gotResults if it finds something
+      cocossd.detect(video, gotResults);
+      state = `cameraPuzzle`; // Switch to the cameraPuzzle state
+    });
+  }
+}
+
+
+  /**
+  Called when CocoSsd has detected at least one object in the video feed
+  */
+  function gotResults(err, results) {
+    if (err) {   // If there's an error, report it
+      console.error(err);
+    }
+    else { // Otherwise, save the results into our predictions array
+      predictions = results;
+    }
+    cocossd.detect(video, gotResults); // Ask CocoSsd to detect objects again so it's continuous
+  }
+
+
   function draw() { // Location where code is excuted.
     if (state === `falseStart`) {
       falseStart();
@@ -241,6 +277,9 @@
     }
     else if (state === `ballPuzzle`) {
       ballPuzzle();
+    }
+    else if (state === `cameraPuzzleLoad`) {
+      cameraPuzzleLoad ();
     }
     else if (state === `cameraPuzzle`) {
       cameraPuzzle ();
@@ -520,7 +559,7 @@
       }
     }
     if (numActiveTokens === 0) { // If we counted zero (0) active token, then change state to winner.
-     state = `cameraPuzzle`; // Swaps to cameraPuzzle state.
+     state = `cameraPuzzleLoad`; // Swaps to cameraPuzzleLoad state.
     }
   }
 
@@ -558,40 +597,76 @@
   }
 }
 
-  // cameraPuzzle STATE
-  function cameraPuzzle() {
-    background(0);
-    displayCameraPuzzleText();
+  // cameraPuzzleLoad STATE
+  function cameraPuzzleLoad() {
+    background(255);
+    displayCameraLoadPuzzleText();
   }
 
-  function displayCameraPuzzleText() {
-    push(); // Isolates code from using global properties.
-    textSize(fontSize.small); // Displays the font size as 32px.
-    fill(255); // Makes the font white in colour.
-    noStroke();
-    textAlign(CENTER, CENTER); // Dictates the text alignment style.
-    text(cameraPuzzleHeading.string, cameraPuzzleHeading.x, cameraPuzzleHeading.y); // Displays the title of the game.
-    pop(); // Isolates code from using global properties.
+  function displayCameraLoadPuzzleText() { // Displays the webcam. If there are currently objects detected it outlines them and labels them with the name and confidence value.
+    push();
+    fill(0); // Make font black in colour.
+    textSize(fontSize.small); // Displays the font size as 18px.
+    textAlign(CENTER, CENTER);
+    text(cameraPuzzleLoadingHeading.string, cameraPuzzleLoadingHeading.x, cameraPuzzleLoadingHeading.y); // Displays the title of the game.
+    text(`Loading ${modelName}...`, width / 2, height / 2);
+    pop();
   }
+
+
+  // cameraPuzzle STATE
+  function cameraPuzzle() {
+    // Display the webcam
+    image(video, 0, 0, width, height);
+
+    // Check if there currently predictions to display
+    if (predictions) {
+      // If so run through the array of predictions
+      for (let i = 0; i < predictions.length; i++) {
+        // Get the object predicted
+        let object = predictions[i];
+        // Highlight it on the canvas
+        highlightObject(object);
+      }
+    }
+  }
+
+  function highlightObject(object) { // Provided with a detected object it draws a box around it and includes its label and confidence value
+
+    // Display a box around it
+    push();
+    noFill();
+    stroke(255, 255, 0);
+    rect(object.x, object.y, object.width, object.height);
+    pop();
+    // Display the label and confidence in the center of the box
+    push();
+    textSize(fontSize.small); // Displays the font size as 18px.
+    fill(255, 255, 0);
+    textAlign(CENTER, CENTER);
+    text(`${object.label}, ${object.confidence.toFixed(2)}`, object.x + object.width / 2, object.y + object.height / 2);
+    pop();
+  }
+
+
+
+
+
+
+
 
 
   // LOSER STATE
   function loser() { // Main landing state code.
     push(); // Isolates code from using global properties.
     background(0); // Displays the background colour as black.
-    textSize(fontSize.small); // Displays the font size as 32px.
+    textSize(fontSize.small); // Displays the font size as 18px.
     fill(255, 0, 0); // Makes the red white in colour.
     noStroke();
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
     text(gameFail.string, gameFail.x, gameFail.y); // Displays the title of the game.
     pop(); // Isolates code from using global properties.
   }
-
-
-
-
-
-
 
 
 
