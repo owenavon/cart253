@@ -24,14 +24,15 @@ class AudioCar {
 
   handleInput() { // Uses microphone input to trasnalate audio car up the y axis.
     let micLevel = mic.getLevel(); // Get microphone volume
+    console.log(micLevel);
 
     let step = map(micLevel, 0, 1, 0, 10); // Create variable that maps the car location to the microphone input
-    this.y -= step; // Add's car y postion eachtime their is microphone input
+    this.y = this.y - step; // Add's car y postion eachtime their is microphone input
   }
 
   move() { // Add velocity to position for movement
-    this.x += this.vx; // Horizontaly Move the car (N/A)
-    this.y += this.vy; // Vertically Move the car
+    this.x = this.x + this.vx; // Horizontaly Move the car (N/A)
+    this.y = this.y + this.vy; // Vertically Move the car
   }
 
   display() { // Displays the audioCar as a circle

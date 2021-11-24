@@ -7,7 +7,10 @@
 
   "use strict";
 
-  let state = `ballPuzzle`; // Starting state of program
+  let state = `landing`; // Starting state of program
+
+  let letters = "";
+  let riddleText;
 
   let video; // User's webcam
   let modelName = `CocoSsd`; // The name of our model
@@ -119,7 +122,7 @@
     y: 150,
   }
 
-  let cameraPuzzleLoadingHeading = { // Creates custom object for secondary heading.
+  let cameraLoadingHeading = { // Creates custom object for secondary heading.
     string: `Hmm, you're starting to appear as human... One more test.`,
     x: 375,
     y: 100,
@@ -164,14 +167,22 @@
     disappear: false
   };
 
+  let flashCamera = {
+    x: 375,
+    y: 375,
+    size: 1,
+    fill: 255,
+  };
+
   function preload() { // P5 function that loads assets in prior to starting the simulation.
     clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
+    riddleText = loadStrings('./assets/text/riddle.txt');
   }
 
   function setup () { // Executes the lines of code contained inside its block.
     createCanvas (750, 750); // Sets the Canvas width and height.
     generateRobotButton();
-    generateAudioinput();
+    generateAudioInput();
     delayVirus();
     generateAudioCar();
 
@@ -196,9 +207,9 @@
     startButton.y = height / 1.5;
   }
 
-  function generateAudioinput() {
-    mic = new p5.AudioIn();
-    mic.start();
+  function generateAudioInput() {
+      mic = new p5.AudioIn();
+      mic.start();
   }
 
   function generateAudioCar() {
@@ -232,14 +243,14 @@
   }
 
   function webcamDetection() {
-    if (state === `cameraPuzzleLoad`) {
+    if (state === `cameraFlash`) {
       // Start webcam and hide the resulting HTML element
       video = createCapture(VIDEO); // Start the CocoSsd model and when it's ready start detection
       video.hide(); // and switch to the running state
 
         cocossd = ml5.objectDetector('cocossd', {}, function() { // Ask CocoSsd to start detecting objects, calls gotResults if it finds something
         cocossd.detect(video, gotResults);
-        state = `cameraPuzzle`; // Switch to the cameraPuzzle state
+        state = `cameraLoad`; // Switch to the cameraPuzzle state
       });
     }
   }
@@ -278,15 +289,18 @@
     else if (state === `ballPuzzle`) {
       ballPuzzle();
     }
-    else if (state === `cameraPuzzleLoad`) {
-      cameraPuzzleLoad ();
+    else if (state === `cameraRiddle`) {
+      cameraRiddle ();
+    }
+    else if (state === `cameraFlash`) {
+      cameraFlash ();
+    }
+    else if (state === `cameraLoad`) {
+      cameraLoad ();
     }
     else if (state === `cameraPuzzle`) {
       cameraPuzzle ();
     }
-    // else if (state === `cameraFlash`) {
-    //   cameraFlash ();
-    // }
     // else if (state === `finalCheck`) {
     //   finalCheck ();
     // }
@@ -440,18 +454,12 @@
     pop(); // Isolates code from using global properties.
   }
 
-  function keyPressed () { // p5 function to perform action with keyboard input.
-    if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
-      state = `audioPuzzle`; // Runs the "simulation" state.
-    }
-  }
-
 
   // audioPuzzle STATE
   function audioPuzzle() { // Main landing state code.
     background(125); // Displays the background colour as black.
-    displayAudioPuzzleText();
 
+    displayAudioPuzzleText();
     audioCarResources();
     audioPotholeTimer();
     audioPotholeStates();
@@ -559,7 +567,7 @@
       }
     }
     if (numActiveTokens === 0) { // If we counted zero (0) active token, then change state to winner.
-     state = `cameraPuzzleLoad`; // Swaps to cameraPuzzleLoad state.
+     state = `cameraRiddle`; // Swaps to cameraLoad state.
     }
   }
 
@@ -597,8 +605,56 @@
     }
   }
 
-  // cameraPuzzleLoad STATE
-  function cameraPuzzleLoad() {
+
+  // cameraRiddle STATE
+  function cameraRiddle() {
+    background(50);
+    displayCameraText();
+    displayRiddleText();
+  }
+
+  function displayCameraText() {
+    push();
+    fill(255); // Make font black in colour.
+    textSize(fontSize.small); // Displays the font size as 18px.
+    textAlign(CENTER, CENTER);
+    text(`Very good. Now you must solve the riddle. Type the answer"`, width / 2, height / 8);
+    text(letters, width / 2, height / 1.15);
+    pop();
+  }
+
+  function displayRiddleText() {
+    textSize(16);
+    for (let i = 0; i < riddleText.length; i++) {
+      fill(128+(i*10));
+      text(riddleText[i], 50, 200+i*20);
+    }
+  }
+
+
+  // cameraFlash STATE
+  function cameraFlash() {
+    push();
+    background(0);
+    noStroke();
+    fill(flashCamera.fill);
+    rectMode (CENTER);
+    ellipse(flashCamera.x, flashCamera.y, flashCamera.size);
+    pop();
+
+    quickFlash();
+  }
+
+  function quickFlash () {
+    flashCamera.size = flashCamera.size + 100;
+
+    if(flashCamera.size > 750)
+      state = `cameraLoad`;
+  }
+
+
+  // cameraLoad STATE
+  function cameraLoad() {
     background(255);
     displayCameraLoadPuzzleText();
   }
@@ -608,7 +664,7 @@
     fill(0); // Make font black in colour.
     textSize(fontSize.small); // Displays the font size as 18px.
     textAlign(CENTER, CENTER);
-    text(cameraPuzzleLoadingHeading.string, cameraPuzzleLoadingHeading.x, cameraPuzzleLoadingHeading.y); // Displays the title of the game.
+    text(cameraLoadingHeading.string, cameraLoadingHeading.x, cameraLoadingHeading.y); // Displays the title of the game.
     text(`Loading ${modelName}...`, width / 2, height / 2);
     pop();
   }
@@ -637,7 +693,6 @@
     stroke(255, 255, 0);
     rect(object.x, object.y, object.width, object.height); // Display a box around it
     pop();
-
 
     push();
     textSize(fontSize.small); // Displays the font size as 18px.
@@ -675,5 +730,21 @@
         let ball = new Ball(x, y, clickSFX) // Calls class and sets parameters.
         balls.push(ball); // Allows ball to generate dpedning on the amount set in numEmergencyBalls.
       }
+    }
+    shuffle(riddleText, true); // Shuffles the riddle text found in cameraRiddle STATE
+  }
+
+
+  //  KEYPRESSED FUNCTION
+  function keyPressed () { // p5 function to perform action with keyboard input.
+    if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
+      state = `audioPuzzle`; // Runs the "simulation" state.
+    }
+    letters = letters + key; // letters variable and key
+    if (keyCode === BACKSPACE) {
+      letters = letters - key;
+    }
+    if (letters === `webcam`) {
+      state = `cameraFlash`; // Swaps to cameraFlash STATE
     }
   }
