@@ -7,7 +7,7 @@
 
   "use strict";
 
-  let state = `landing`; // Starting state of program
+  let state = `falseStart`; // Starting state of program
 
   let letters = "";
   let riddleText;
@@ -30,6 +30,7 @@
   let numTokens = 5; // Provides a dynamic number of instances inside the array.
 
   let clickSFX = undefined; // Sets clickSFX as a variable.
+  let jeopardySFX = undefined; // Sets jeopardySFX as a variable.
 
   let audioCar;
   let potholes = [];
@@ -176,6 +177,7 @@
 
   function preload() { // P5 function that loads assets in prior to starting the simulation.
     clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
+    jeopardySFX = loadSound (`./assets/sounds/jeopardy.mp3`); // Preloads the "jeopardy" for efficient load times.
     riddleText = loadStrings('./assets/text/riddle.txt');
   }
 
@@ -243,23 +245,19 @@
   }
 
   function webcamDetection() {
-    if (state === `cameraFlash`) {
+    if (state === `cameraPuzzle`) { // REMOVE THIS TO MAKE IT WORK. FIIGURE OUT HOW TO MAKE IT START IN STATE.
       // Start webcam and hide the resulting HTML element
       video = createCapture(VIDEO); // Start the CocoSsd model and when it's ready start detection
       video.hide(); // and switch to the running state
 
         cocossd = ml5.objectDetector('cocossd', {}, function() { // Ask CocoSsd to start detecting objects, calls gotResults if it finds something
         cocossd.detect(video, gotResults);
-        state = `cameraLoad`; // Switch to the cameraPuzzle state
+        state = `cameraPuzzle`; // Switch to the cameraPuzzle state
       });
     }
   }
 
-
-  /**
-  Called when CocoSsd has detected at least one object in the video feed
-  */
-  function gotResults(err, results) {
+  function gotResults(err, results) { // Called when CocoSsd has detected at least one object in the video feed
     if (err) {   // If there's an error, report it
       console.error(err);
     }
@@ -535,6 +533,7 @@
   function ballPuzzle() { // Main landing state code.
     background(50); // Displays the background colour as black.
     displayBallPuzzleText();
+    playJingle();
 
     updatePaddle(); // // Function that calls the paddles move and display properties.
     updateToken(); // Function that calls the number of token's Forloop.
@@ -550,6 +549,12 @@
     text(ballPuzzleHeading.string, ballPuzzleHeading.x, ballPuzzleHeading.y); // Displays the title of the game.
     text(ballPuzzleSubHeading.string, ballPuzzleSubHeading.x, ballPuzzleSubHeading.y); // Displays the title of the game.
     pop(); // Isolates code from using global properties.
+  }
+
+  function playJingle() {
+    if (!jeopardySFX.isPlaying()) { // States that if the click sound effect is not playing, it will be played everytime a ball touches the paddle
+      jeopardySFX.play();
+    }
   }
 
   function updatePaddle() { // Calls the function in Simulation
@@ -568,6 +573,7 @@
     }
     if (numActiveTokens === 0) { // If we counted zero (0) active token, then change state to winner.
      state = `cameraRiddle`; // Swaps to cameraLoad state.
+     jeopardySFX.stop();
     }
   }
 
@@ -602,6 +608,7 @@
      }
      if (numActiveBalls === 0) { // If we counted zero (0) active balls, then change state to loser.
        state = `loser`; // Swaps to loser state.
+       jeopardySFX.stop();
     }
   }
 
@@ -625,6 +632,7 @@
 
   function displayRiddleText() {
     textSize(16);
+    noStroke();
     for (let i = 0; i < riddleText.length; i++) {
       fill(128+(i*10));
       text(riddleText[i], 50, 200+i*20);
@@ -740,10 +748,11 @@
     if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
       state = `audioPuzzle`; // Runs the "simulation" state.
     }
-    letters = letters + key; // letters variable and key
-    if (keyCode === BACKSPACE) {
-      letters = letters - key;
+
+    if (state === `cameraRiddle`) {
+      letters = letters + key; // letters variable and key
     }
+
     if (letters === `webcam`) {
       state = `cameraFlash`; // Swaps to cameraFlash STATE
     }

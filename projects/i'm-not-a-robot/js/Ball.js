@@ -32,7 +32,10 @@ class Ball { // Creates a class that is called from script.js
     this.x = this.x + this.vx; // Provides a horizontal velocity based off of the ball's X postion.
     this.y = this.y + this.vy; // Provides a vertical velocity based off of the ball's Y postion.
 
-    this.x = constrain(this.x, 0, width); // Constrains the ball to the canvas width.
+    if (this.x > width || this.x < 0) { // Provides the canvas's left and right width
+      this.vx = this.vx * -1;
+      this.ax = 0; // Provides the ball with a consistent acceleration after each bounce.
+    }
 
     if (this.y - this.size / 2 > height) { // States that if the ball goes below the canvas, then...
       this.view = false; // Stop drawing the ball. This keeps the program lighter and thus more efficent.
