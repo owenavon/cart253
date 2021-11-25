@@ -45,6 +45,9 @@
   let mic;
   let autoTimer = 5; // Sets the timer's value.
 
+  let textFade;
+  let textFadeAmount = 1;
+
   let gameFalseStart = {
     string: `I'm not a Robot`,
     x: 375,
@@ -100,7 +103,7 @@
   }
 
   let audioPuzzleHeading = { // Creates custom object for secondary heading.
-    string: `Navigate the car up the road with your voice.`,
+    string: `Navigate the car up the road with your voice. (Or up arrow key...)`,
     x: 375,
     y: 100,
   }
@@ -127,6 +130,18 @@
     string: `Hmm, you're starting to appear as human... One more test.`,
     x: 375,
     y: 100,
+  }
+
+  let finalCheckHeading = { // Creates custom object for Primary heading.
+    string: `Wow, maybe you actually are human?`,
+    x: 375,
+    y: 100,
+  }
+
+  let finalCheckSubHeading = { // Creates custom object for Primary heading.
+    string: `Lets try this again...`,
+    x: 375,
+    y: 200,
   }
 
   let gameSuccess = {
@@ -168,6 +183,16 @@
     disappear: false
   };
 
+  let finalStartButton = {
+    x: undefined,
+    y: undefined,
+    size: 100,
+    fill: 255,
+    highLightFill: 128,
+    normalFill: 255,
+    disappear: false
+  };
+
   let flashCamera = {
     x: 375,
     y: 375,
@@ -193,7 +218,7 @@
     mousePressed();
     spawnInitialBalls(); // Function that is called to generate the first emergency ball.
 
-    webcamDetection();
+    generateTextFade();
   }
 
   function delayVirus () {
@@ -244,27 +269,8 @@
     }
   }
 
-  function webcamDetection() {
-    if (state === `cameraPuzzle`) { // REMOVE THIS TO MAKE IT WORK. FIIGURE OUT HOW TO MAKE IT START IN STATE.
-      // Start webcam and hide the resulting HTML element
-      video = createCapture(VIDEO); // Start the CocoSsd model and when it's ready start detection
-      video.hide(); // and switch to the running state
-
-        cocossd = ml5.objectDetector('cocossd', {}, function() { // Ask CocoSsd to start detecting objects, calls gotResults if it finds something
-        cocossd.detect(video, gotResults);
-        state = `cameraPuzzle`; // Switch to the cameraPuzzle state
-      });
-    }
-  }
-
-  function gotResults(err, results) { // Called when CocoSsd has detected at least one object in the video feed
-    if (err) {   // If there's an error, report it
-      console.error(err);
-    }
-    else { // Otherwise, save the results into our predictions array
-      predictions = results;
-    }
-    cocossd.detect(video, gotResults); // Ask CocoSsd to detect objects again so it's continuous
+  function generateTextFade() {
+    textFade = 0;
   }
 
 
@@ -299,12 +305,12 @@
     else if (state === `cameraPuzzle`) {
       cameraPuzzle ();
     }
-    // else if (state === `finalCheck`) {
-    //   finalCheck ();
-    // }
-    // else if (state === `winner`) {
-    //   winner ();
-    // }
+    else if (state === `finalCheck`) {
+      finalCheck ();
+    }
+    else if (state === `winner`) {
+      winner ();
+    }
     else if (state === `loser`) {
       loser ();
     }
@@ -314,11 +320,11 @@
   // FALSESTART STATE
   function falseStart() { // Main landing state code.
     background(0); // Displays the background colour as black.
-    displayFalseStartText();
 
+    displayFalseStartText();
+    startButtonHighLight();
     startButtonOverlap();
     displayStartButton();
-    startButtonHighLight();
   }
 
   function displayFalseStartText() {
@@ -618,6 +624,7 @@
     background(50);
     displayCameraText();
     displayRiddleText();
+    displayAnswerField();
   }
 
   function displayCameraText() {
@@ -625,18 +632,40 @@
     fill(255); // Make font black in colour.
     textSize(fontSize.small); // Displays the font size as 18px.
     textAlign(CENTER, CENTER);
-    text(`Very good. Now you must solve the riddle. Type the answer"`, width / 2, height / 8);
-    text(letters, width / 2, height / 1.15);
+    text(`Very good. Now you must solve the riddle. Type the answer`, width / 2, height / 8);
+    text(`Answer:`, width / 2.5, height / 1.15);
+
+    rectMode(CENTER);
+    noStroke();
+    rect(410, 660, 150, 1);
     pop();
   }
 
   function displayRiddleText() {
-    textSize(16);
+    textSize(fontSize.small);
     noStroke();
+    textAlign(LEFT, TOP);
+
     for (let i = 0; i < riddleText.length; i++) {
-      fill(128+(i*10));
-      text(riddleText[i], 50, 200+i*20);
+      let words = riddleText[i].split(" ");
+      let currentOffset = 0;
+      for (let j = 0; j < riddleText.length; j++) {
+        let wordWidth = textWidth(words[j]);
+        fill(255);
+        rect(25+currentOffset, 200+i*20,
+          wordWidth, 16);
+        if (mouseIsPressed) {
+          fill(0);
+          text(words[j], 25+currentOffset, 200+i*20);
+        }
+        currentOffset += wordWidth + 4; // four pixels between words
+      }
     }
+
+  }
+
+  function displayAnswerField() {
+    text(letters, width / 2, height / 1.17);
   }
 
 
@@ -655,7 +684,6 @@
 
   function quickFlash () {
     flashCamera.size = flashCamera.size + 100;
-
     if(flashCamera.size > 750)
       state = `cameraLoad`;
   }
@@ -664,10 +692,11 @@
   // cameraLoad STATE
   function cameraLoad() {
     background(255);
-    displayCameraLoadPuzzleText();
+    displayLoadingText();
+    webcamDetection();
   }
 
-  function displayCameraLoadPuzzleText() { // Displays the webcam. If there are currently objects detected it outlines them and labels them with the name and confidence value.
+  function displayLoadingText() { // Displays the webcam. If there are currently objects detected it outlines them and labels them with the name and confidence value.
     push();
     fill(0); // Make font black in colour.
     textSize(fontSize.small); // Displays the font size as 18px.
@@ -677,20 +706,42 @@
     pop();
   }
 
+  function webcamDetection() {
+    // Start webcam and hide the resulting HTML element
+    video = createCapture(VIDEO); // Start the CocoSsd model and when it's ready start detection
+    video.hide(); // and switch to the running state
+
+      cocossd = ml5.objectDetector('cocossd', {}, function() { // Ask CocoSsd to start detecting objects, calls gotResults if it finds something
+      cocossd.detect(video, gotResults);
+      state = `cameraPuzzle`; // Switch to the cameraPuzzle state
+    });
+  }
+
+  function gotResults(err, results) { // Called when CocoSsd has detected at least one object in the video feed
+    if (err) {   // If there's an error, report it
+      console.error(err);
+    }
+    else { // Otherwise, save the results into our predictions array
+      predictions = results;
+    }
+    cocossd.detect(video, gotResults); // Ask CocoSsd to detect objects again so it's continuous
+  }
+
 
   // cameraPuzzle STATE
   function cameraPuzzle() {
-    // Display the webcam
-    image(video, 0, 0, width, height);
+    image(video, 0, 0, width, 600); // Display the webcam
 
-    // Check if there currently predictions to display
-    if (predictions) {
-      // If so run through the array of predictions
-      for (let i = 0; i < predictions.length; i++) {
+    if (predictions) { // Check if there currently predictions to display
+      for (let i = 0; i < predictions.length; i++) { // If so run through the array of predictions
         // Get the object predicted
         let object = predictions[i];
-        // Highlight it on the canvas
-        highlightObject(object);
+        if (object.label === `person` && object.confidence > 0.94) {
+          state = `finalCheck`;
+        }
+        else {
+          highlightObject(object); // Highlight it on the canvas
+        }
       }
     }
   }
@@ -711,6 +762,58 @@
   }
 
 
+  // FINAL CHECK
+  function finalCheck() {
+    background(0);
+    finalCheckText();
+    reusablecontent();
+  }
+
+  function finalCheckText() {
+    push(); // Isolates code from using global properties.
+    textSize(fontSize.small); // Displays the font size as 32px.
+    fill(255); // Makes the font white in colour.
+    textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    text(finalCheckHeading.string, finalCheckHeading.x, finalCheckHeading.y);
+    pop();
+
+    opaqueContent();
+  }
+
+  function opaqueContent() {
+    push();
+    textSize(fontSize.small); // Displays the font size as 32px.
+    fill(255, textFade)
+    textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    text(finalCheckSubHeading.string, finalCheckSubHeading.x, finalCheckSubHeading.y);
+    pop();
+
+    if (textFade < 0) textFadeAmount = 50; {
+      textFade = textFade + textFadeAmount;
+    }
+  }
+
+  function reusablecontent() {
+    displayFalseStartText();
+    startButtonHighLight();
+    startButtonOverlap();
+    displayStartButton();
+  }
+
+
+  // WINNER STATE
+  function winner() { // Main landing state code.
+    push(); // Isolates code from using global properties.
+    background(0); // Displays the background colour as black.
+    textSize(fontSize.large); // Displays the font size as 18px.
+    fill(0, 255, 0); // Makes the red white in colour.
+    noStroke();
+    textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    text(gameSuccess.string, gameSuccess.x, gameSuccess.y); // Displays the title of the game.
+    pop(); // Isolates code from using global properties.
+  }
+
+
   // LOSER STATE
   function loser() { // Main landing state code.
     push(); // Isolates code from using global properties.
@@ -726,10 +829,18 @@
 
   // MOUSE PRESS FUNCTION
   function mousePressed() {
+
+
     if (startButtonOverlap()) {
       startButton.disappear = true;
       state = `error`;
     }
+
+    else if (startButtonOverlap()) {
+      startButton.disappear = true;
+      state = `winner`;
+    }
+
     if (state === 'ballPuzzle') { // Says only apply the below if in simulation state.
       let x = mouseX; // Makes the mouse capable of clicking on a x postion.
       let y = mouseY; // Males the mouse capable of clicking on a y postion.
@@ -739,7 +850,7 @@
         balls.push(ball); // Allows ball to generate dpedning on the amount set in numEmergencyBalls.
       }
     }
-    shuffle(riddleText, true); // Shuffles the riddle text found in cameraRiddle STATE
+
   }
 
 
@@ -751,9 +862,8 @@
 
     if (state === `cameraRiddle`) {
       letters = letters + key; // letters variable and key
-    }
-
-    if (letters === `webcam`) {
-      state = `cameraFlash`; // Swaps to cameraFlash STATE
+      if (letters === `webcam`) {
+        state = `cameraFlash`; // Swaps to cameraFlash STATE
+      }
     }
   }

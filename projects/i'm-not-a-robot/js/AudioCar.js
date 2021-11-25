@@ -22,6 +22,7 @@ class AudioCar {
   }
 
   handleInput() { // Uses microphone input to trasnalate audio car up the y axis.
+
     this.y = this.y + this.vy; // Provides the paddle's with velocity to allow for horizontal movement.
     this.y = constrain(this.y, 0, width); // Constrains the paddle's horizontal movement within the canvas.
 
@@ -32,11 +33,11 @@ class AudioCar {
       this.vy = 1; // Provides a deceleration when translated to the left.
     }
 
-    // let micLevel = mic.getLevel(); // Get microphone volume
-    // console.log(micLevel);
-    //
-    // let step = map(micLevel, 0, 1, 0, 10); // Create variable that maps the car location to the microphone input
-    // this.y = this.y - step; // Add's car y postion eachtime their is microphone input
+    let micLevel = mic.getLevel(); // Get microphone volume
+    console.log(micLevel);
+
+    let step = map(micLevel, 0, 1, 0, 10); // Create variable that maps the car location to the microphone input
+    this.y = this.y - step; // Add's car y postion eachtime their is microphone input
   }
 
   move() { // Add velocity to position for movement
