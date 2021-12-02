@@ -31,6 +31,7 @@
 
   let clickSFX = undefined; // Sets clickSFX as a variable.
   let jeopardySFX = undefined; // Sets jeopardySFX as a variable.
+  let congratsSFX = undefined; // Sets congratsSFX as a variable.
 
   let audioCar;
   let potholes = [];
@@ -51,7 +52,7 @@
   let gameFalseStart = {
     string: `I'm not a Robot`,
     x: 375,
-    y: 375,
+    y: 300,
   }
 
   let gameError = {
@@ -69,11 +70,11 @@
   let gameIntroTextLine2 = { // Creates custom object for main heading.
     string: `You must prove that you are human before proceeding...`,
     x: 375,
-    y: 350,
+    y: 335,
   }
 
   let gameTitle = { // Creates custom object for main heading.
-    string: `I'm not a robot`,
+    string: `I'm not a Robot`,
     x: 375,
     y: 300,
   }
@@ -91,15 +92,15 @@
   }
 
   let gameControl = { // Creates custom object for secondary heading.
-    string: `CONTROLS: Vary dpending on puzzles. Follow on screen instruction.`,
+    string: `CONTROLS: Vary depending on puzzles. Follow on screen instruction.`,
     x: 375,
-    y: 640,
+    y: 635,
   }
 
   let gameNote = { // Creates custom object for secondary heading.
-    string: `NOTE: Allow the web broswer to acess audio & video inputs for the full experience.`,
+    string: `NOTE: Allow the web broswer to access audio & video inputs for the full experience.`,
     x: 375,
-    y: 680,
+    y: 670,
   }
 
   let audioPuzzleHeading = { // Creates custom object for secondary heading.
@@ -111,19 +112,37 @@
   let audioPuzzleSubHeading = { // Creates custom object for secondary heading.
     string: `The louder you talk, the faster the car moves. Avoid potholes at all costs.`,
     x: 375,
-    y: 125,
+    y: 135,
   }
 
   let ballPuzzleHeading = { // Creates custom object for secondary heading.
-    string: `Very good... Now you must successfully collect all the tokens.`,
+    string: `Splendid! Now you must successfully collect all the tokens.`,
     x: 375,
     y: 100,
   }
 
   let ballPuzzleSubHeading = { // Creates custom object for secondary heading.
-    string: `Collect the tokens by bouncing the balls into them.`,
+    string: `Collect the tokens by bouncing the balls into them. A mouse click might help...`,
     x: 375,
-    y: 150,
+    y: 135,
+  }
+
+  let cameraRiddleHeading = { // Creates custom object for primary heading.
+    string: `Very good. Solve the riddle... A mouse press might help?`,
+    x: 375,
+    y: 93.75,
+  }
+
+  let cameraRiddleSubHeading = { // Creates custom object for secondary heading.
+    string: `Type the answer in lowercase letters, followed by "ENTER"`,
+    x: 375,
+    y: 600,
+  }
+
+  let cameraRiddleAnswerHeading = { // Creates custom object for tertiary heading.
+    string: `Answer:`,
+    x: 300,
+    y: 652,
   }
 
   let cameraLoadingHeading = { // Creates custom object for secondary heading.
@@ -141,23 +160,23 @@
   let finalCheckSubHeading = { // Creates custom object for Primary heading.
     string: `Lets try this again...`,
     x: 375,
-    y: 200,
+    y: 135,
   }
 
   let finalStartButtonText = {
     string: `I'm not a Robot`,
     x: 375,
-    y: 375,
+    y: 300,
   }
 
   let gameSuccess = {
-    string: `You're not a robot`,
+    string: `You're not a Robot`,
     x: 375,
     y: 375,
   }
 
   let gameFail = {
-    string: `For security reasons, you must re-start the simulation`,
+    string: `You must re-start the simulation for security reasons.`,
     x: 375,
     y: 375,
   }
@@ -176,7 +195,7 @@
     vSmall: 12,
     small: 18,
     medium: 64,
-    large: 96
+    large: 82
   };
 
   let startButton = {
@@ -206,12 +225,17 @@
     fill: 255,
   };
 
+
+  // PRELOAD
   function preload() { // P5 function that loads assets in prior to starting the simulation.
     clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
     jeopardySFX = loadSound (`./assets/sounds/jeopardy.mp3`); // Preloads the "jeopardy" for efficient load times.
-    riddleText = loadStrings('./assets/text/riddle.txt');
+    congratsSFX = loadSound (`./assets/sounds/congrats.mp3`); // Preloads the "congarts" for efficient load times.
+    riddleText = loadStrings('./assets/text/riddle.txt'); // Preloads the "riddle" txt file efficient load times.
   }
 
+
+  // SETUP
   function setup () { // Executes the lines of code contained inside its block.
     createCanvas (750, 750); // Sets the Canvas width and height.
     generateRobotButton();
@@ -238,12 +262,12 @@
 
   function generateRobotButton() {
     startButton.x = width / 2;
-    startButton.y = height / 1.5;
+    startButton.y = height / 1.75;
   }
 
   function generateFinalRobotButton() {
     finalStartButton.x = width / 2;
-    finalStartButton.y = height / 1.5;
+    finalStartButton.y = height / 1.75;
   }
 
   function generateAudioInput() {
@@ -286,6 +310,7 @@
   }
 
 
+  // Draw
   function draw() { // Location where code is excuted.
     if (state === `falseStart`) {
       falseStart();
@@ -446,6 +471,7 @@
   // landing STATE
   function landing () { // Main landing state code.
     background(0); // Displays the background colour as black.
+    displayLandingHeadingText();
     displayLandingText();
   }
 
@@ -456,13 +482,22 @@
     }
   }
 
-  function displayLandingText() {
+  function displayLandingHeadingText() {
     push(); // Isolates code from using global properties.
-    textSize(fontSize.small); // Displays the font size as 32px.
+    textSize(fontSize.medium); // Displays the font size as 32px.
     fill(0, 255, 0); // Makes the font white in colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
     noStroke();
     text(gameTitle.string, gameTitle.x, gameTitle.y); // Displays the title of the game.
+    pop(); // Isolates code from using global properties.
+  }
+
+  function displayLandingText() {
+    push(); // Isolates code from using global properties.
+    textSize(fontSize.small); // Displays the font size as 32px.
+    fill(255); // Makes the font white in colour.
+    textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    noStroke();
     text(gameStart.string, gameStart.x, gameStart.y); // Displays the text that dictates what the user must press to start the game.
     text(gameObjective.string, gameObjective.x, gameObjective.y); // Displays the text that dictates what the user must press to start the game.
     text(gameControl.string, gameControl.x, gameControl.y); // Displays the text that dictates what the user must press to start the game.
@@ -633,7 +668,7 @@
 
   // cameraRiddle STATE
   function cameraRiddle() {
-    background(50);
+    background(100);
     displayCameraText();
     displayRiddleText();
     displayAnswerField();
@@ -644,8 +679,9 @@
     fill(255); // Make font black in colour.
     textSize(fontSize.small); // Displays the font size as 18px.
     textAlign(CENTER, CENTER);
-    text(`Very good. Now you must solve the riddle. Type the answer`, width / 2, height / 8);
-    text(`Answer:`, width / 2.5, height / 1.15);
+    text(cameraRiddleHeading.string, cameraRiddleHeading.x, cameraRiddleHeading.y);
+    text(cameraRiddleSubHeading.string, cameraRiddleSubHeading.x, cameraRiddleSubHeading.y);
+    text(cameraRiddleAnswerHeading.string, cameraRiddleAnswerHeading.x, cameraRiddleAnswerHeading.y);
 
     rectMode(CENTER);
     noStroke();
@@ -658,18 +694,20 @@
     noStroke();
     textAlign(LEFT, TOP);
 
-    for (let i = 0; i < riddleText.length; i++) {
+    for (let i = 0; i < riddleText.length; i++) { // Array for text
       let words = riddleText[i].split(" ");
       let currentOffset = 0;
-      for (let j = 0; j < riddleText.length; j++) {
+
+      for (let j = 0; j < riddleText.length; j++) { // Array for visible blocks
         let wordWidth = textWidth(words[j]);
-        fill(255);
-        rect(25+currentOffset, 200+i*20,
-          wordWidth, 16);
+        fill(0); // Makes blocks black in color
+        rect(275 + currentOffset, 275 + i * 25, wordWidth, 20);
+
         if (mouseIsPressed) {
-          fill(0);
-          text(words[j], 25+currentOffset, 200+i*20);
+          fill(255); // Makes text white in colour
+          text(words[j], 275 + currentOffset, 275 + i * 25);
         }
+
         currentOffset += wordWidth + 4; // four pixels between words
       }
     }
@@ -778,32 +816,23 @@
   function finalCheck() { // Main landing state code.
     background(0); // Displays the background colour as black.
 
-    finalCheckText();
-    opaqueContent();
+    finalFadeTextCheck();
     finalDisplayFalseStartText();
     finalStartButtonHighLight();
     finalStartButtonOverlap();
     finalDisplayStartButton();
   }
 
-  function finalCheckText() {
-    push(); // Isolates code from using global properties.
-    textSize(fontSize.small); // Displays the font size as 32px.
-    fill(255); // Makes the font white in colour.
-    textAlign(CENTER, CENTER); // Dictates the text alignment style.
-    text(finalCheckHeading.string, finalCheckHeading.x, finalCheckHeading.y);
-    pop();
-  }
-
-  function opaqueContent() {
+  function finalFadeTextCheck() {
     push();
     textSize(fontSize.small); // Displays the font size as 32px.
     fill(255, textFade)
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    text(finalCheckHeading.string, finalCheckHeading.x, finalCheckHeading.y);
     text(finalCheckSubHeading.string, finalCheckSubHeading.x, finalCheckSubHeading.y);
     pop();
 
-    if (textFade < 0) textFadeAmount = 50; {
+    if (textFade < 0) textFadeAmount = 5; {
       textFade = textFade + textFadeAmount;
     }
   }
@@ -852,9 +881,14 @@
 
   // winner STATE
   function winner() { // Main landing state code.
-    push(); // Isolates code from using global properties.
     background(0); // Displays the background colour as black.
-    textSize(fontSize.large); // Displays the font size as 18px.
+    winnerText();
+    jingleDelay();
+  }
+
+  function winnerText() {
+    push(); // Isolates code from using global properties.
+    textSize(fontSize.large); // Displays the font size as 82px.
     fill(0, 255, 0); // Makes the red white in colour.
     noStroke();
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
@@ -863,10 +897,27 @@
   }
 
 
+  function jingleDelay() { // Main code for dynamic game clock.
+    if (frameCount % 1 == 0 && autoTimer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
+      autoTimer --;
+    }
+    if (autoTimer == 0 && state === `winner` ) { // If the timer hits zero (0), then...
+      if (!congratsSFX.isPlaying()) { // States that if the click sound effect is not playing, it will be played everytime a ball touches the paddle
+        congratsSFX.play();
+
+      }
+    }
+  }
+
+
   // loser STATE
   function loser() { // Main landing state code.
-    push(); // Isolates code from using global properties.
     background(0); // Displays the background colour as black.
+    loserText();
+  }
+
+  function loserText() {
+    push(); // Isolates code from using global properties.
     textSize(fontSize.small); // Displays the font size as 18px.
     fill(255, 0, 0); // Makes the red white in colour.
     noStroke();
@@ -907,6 +958,12 @@
 
   }
 
+  // KEYTYPED FUNCTION
+  function keyTyped() {
+    if (state === `cameraRiddle`) {
+      letters = letters + key;
+    }
+  }
 
   // KEYPRESSED FUNCTION
   function keyPressed () { // p5 function to perform action with keyboard input.
@@ -915,9 +972,12 @@
     }
 
     if (state === `cameraRiddle`) {
-      letters = letters + key; // letters variable and key
-      if (letters === `webcam`) {
+      if (keyCode === BACKSPACE) {
+        letters = letters.slice(0, letters.length - 1); // This is a way to remove the last character in a string!
+      }
+      else if (letters === `webcam`) {
         state = `cameraFlash`; // Swaps to cameraFlash STATE
       }
     }
+
   }
