@@ -144,6 +144,12 @@
     y: 200,
   }
 
+  let finalStartButtonText = {
+    string: `I'm not a Robot`,
+    x: 375,
+    y: 375,
+  }
+
   let gameSuccess = {
     string: `You're not a robot`,
     x: 375,
@@ -209,6 +215,7 @@
   function setup () { // Executes the lines of code contained inside its block.
     createCanvas (750, 750); // Sets the Canvas width and height.
     generateRobotButton();
+    generateFinalRobotButton();
     generateAudioInput();
     delayVirus();
     generateAudioCar();
@@ -232,6 +239,11 @@
   function generateRobotButton() {
     startButton.x = width / 2;
     startButton.y = height / 1.5;
+  }
+
+  function generateFinalRobotButton() {
+    finalStartButton.x = width / 2;
+    finalStartButton.y = height / 1.5;
   }
 
   function generateAudioInput() {
@@ -317,7 +329,7 @@
   }
 
 
-  // FALSESTART STATE
+  // falseStart STATE
   function falseStart() { // Main landing state code.
     background(0); // Displays the background colour as black.
 
@@ -369,7 +381,7 @@
     }
   }
 
-  // ERROR STATE
+  // error STATE
   function error() { // Main landing state code.
     background(0); // Displays the background colour as black.
     displayErrorText();
@@ -411,7 +423,7 @@
   }
 
 
-  // INSTRUCTIONS STATE
+  // instructions STATE
   function instructions () { // Main landing state code.
     background(0); // Displays the background colour as black.
     displayInstructionsText();
@@ -431,7 +443,7 @@
   }
 
 
-  // LANDING STATE
+  // landing STATE
   function landing () { // Main landing state code.
     background(0); // Displays the background colour as black.
     displayLandingText();
@@ -736,7 +748,7 @@
       for (let i = 0; i < predictions.length; i++) { // If so run through the array of predictions
         // Get the object predicted
         let object = predictions[i];
-        if (object.label === `person` && object.confidence > 0.94) {
+        if (object.label === `person` && object.confidence > 0.93) {
           state = `finalCheck`;
         }
         else {
@@ -762,11 +774,16 @@
   }
 
 
-  // FINAL CHECK
-  function finalCheck() {
-    background(0);
+  // finalCheck STATE
+  function finalCheck() { // Main landing state code.
+    background(0); // Displays the background colour as black.
+
     finalCheckText();
-    reusablecontent();
+    opaqueContent();
+    finalDisplayFalseStartText();
+    finalStartButtonHighLight();
+    finalStartButtonOverlap();
+    finalDisplayStartButton();
   }
 
   function finalCheckText() {
@@ -776,8 +793,6 @@
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
     text(finalCheckHeading.string, finalCheckHeading.x, finalCheckHeading.y);
     pop();
-
-    opaqueContent();
   }
 
   function opaqueContent() {
@@ -793,15 +808,49 @@
     }
   }
 
-  function reusablecontent() {
-    displayFalseStartText();
-    startButtonHighLight();
-    startButtonOverlap();
-    displayStartButton();
+  function finalDisplayFalseStartText() {
+    push(); // Isolates code from using global properties.
+    textSize(fontSize.medium); // Displays the font size as 32px.
+    fill(255); // Makes the font white in colour.
+    textAlign(CENTER, CENTER); // Dictates the text alignment style.
+    text(finalStartButtonText.string, finalStartButtonText.x, finalStartButtonText.y); // Displays the title of the game.
+    pop(); // Isolates code from using global properties.
   }
 
+  function finalStartButtonHighLight() { // Highlight function for start button.
+    let d = dist(mouseX, mouseY, finalStartButton.x, finalStartButton.y);
+    if (d < finalStartButton.size / 2) {
+      finalStartButton.fill = finalStartButton.highLightFill;
+      cursor(HAND);
+    }
+    else {
+      finalStartButton.fill = finalStartButton.normalFill;
+      cursor(ARROW);
+    }
+  }
 
-  // WINNER STATE
+  function finalStartButtonOverlap() {
+    let d = dist(mouseX, mouseY, finalStartButton.x, finalStartButton.y);
+    if (d < finalStartButton.size / 2) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  function finalDisplayStartButton() {
+    if (!finalStartButton.disappear) {
+    push();
+    noStroke();
+    fill(finalStartButton.fill);
+    rectMode (CENTER);
+    rect(finalStartButton.x, finalStartButton.y, finalStartButton.size);
+    pop();
+    }
+  }
+
+  // winner STATE
   function winner() { // Main landing state code.
     push(); // Isolates code from using global properties.
     background(0); // Displays the background colour as black.
@@ -814,7 +863,7 @@
   }
 
 
-  // LOSER STATE
+  // loser STATE
   function loser() { // Main landing state code.
     push(); // Isolates code from using global properties.
     background(0); // Displays the background colour as black.
@@ -830,15 +879,20 @@
   // MOUSE PRESS FUNCTION
   function mousePressed() {
 
-
-    if (startButtonOverlap()) {
-      startButton.disappear = true;
-      state = `error`;
+    if (state === `falseStart`) {
+      let d = dist(mouseX, mouseY, startButton.x, startButton.y);
+      if (d < startButton.size / 2) {
+        startButton.disappear = true;
+        state = `error`;
+      }
     }
 
-    else if (startButtonOverlap()) {
-      startButton.disappear = true;
-      state = `winner`;
+    if (state === `finalCheck`) {
+      let d = dist(mouseX, mouseY, finalStartButton.x, finalStartButton.y);
+      if (d < finalStartButton.size / 2) {
+        finalStartButton.disappear = true;
+        state = `winner`;
+      }
     }
 
     if (state === 'ballPuzzle') { // Says only apply the below if in simulation state.
@@ -854,7 +908,7 @@
   }
 
 
-  //  KEYPRESSED FUNCTION
+  // KEYPRESSED FUNCTION
   function keyPressed () { // p5 function to perform action with keyboard input.
     if (keyCode === 13 && state === `landing`) { // Says when the "Enter" key is pushed, and the state is in "landing", switch to the "simulation" state.
       state = `audioPuzzle`; // Runs the "simulation" state.
