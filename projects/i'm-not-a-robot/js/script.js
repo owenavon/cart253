@@ -30,7 +30,6 @@
   let numTokens = 5; // Provides a dynamic number of instances inside the array.
 
   let clickSFX = undefined; // Sets clickSFX as a variable.
-  let jeopardySFX = undefined; // Sets jeopardySFX as a variable.
   let congratsSFX = undefined; // Sets congratsSFX as a variable.
 
   let audioCar;
@@ -48,6 +47,16 @@
 
   let textFade;
   let textFadeAmount = 1;
+
+  let synth; // Our synthesizer
+  let notes = [   `F1`, `G1`, `Ab2`, `Bb2`, `C2`, `Dd2`, `Eb2`,
+                  `F2`, `G2`, `Ab3`, `Bb3`, `C3`, `Dd3`, `Eb3`,
+                  `F3`, `G3`, `Ab4`, `Bb4`, `C4`, `Dd4`, `Eb4`,
+                  `F4`, `G4`, `Ab5`, `Bb5`, `C5`, `Dd5`, `Eb5`,
+                  `F5`, `G5`, `Ab6`, `Bb6`, `C6`, `Dd6`, `Eb6`,
+                  `F6`, `G6`, `Ab7`, `Bb7`, `C7`, `Dd7`, `Eb7`,]; // The scale for F minor ("b" means "flat" if you haven't seen it before)
+  let currentNote = 0; // The current note to play, start at the beginning
+  let interval; // To track the interval that plays note
 
   let gameFalseStart = {
     string: `I'm not a Robot`,
@@ -122,9 +131,15 @@
   }
 
   let ballPuzzleSubHeading = { // Creates custom object for secondary heading.
-    string: `Collect the tokens by bouncing the balls into them. A mouse click might help...`,
+    string: `The catch! Complete this task within 6 repetitions of the F Minor scale`,
     x: 375,
     y: 135,
+  }
+
+  let ballPuzzleTertiaryHeading = { // Creates custom object for secondary heading.
+    string: `Collect the tokens by bouncing the balls into them. A mouse click might help...`,
+    x: 375,
+    y: 170,
   }
 
   let cameraRiddleHeading = { // Creates custom object for primary heading.
@@ -229,7 +244,6 @@
   // PRELOAD
   function preload() { // P5 function that loads assets in prior to starting the simulation.
     clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
-    jeopardySFX = loadSound (`./assets/sounds/jeopardy.mp3`); // Preloads the "jeopardy" for efficient load times.
     congratsSFX = loadSound (`./assets/sounds/congrats.mp3`); // Preloads the "congarts" for efficient load times.
     riddleText = loadStrings('./assets/text/riddle.txt'); // Preloads the "riddle" txt file efficient load times.
   }
@@ -250,6 +264,7 @@
     spawnInitialBalls(); // Function that is called to generate the first emergency ball.
 
     generateTextFade();
+    generatePolySynth();
   }
 
   function delayVirus () {
@@ -307,6 +322,11 @@
 
   function generateTextFade() {
     textFade = 0;
+  }
+
+  function generatePolySynth() {
+    userStartAudio();
+    synth = new p5.PolySynth(); // Create the synthesizer
   }
 
 
@@ -586,7 +606,6 @@
   function ballPuzzle() { // Main landing state code.
     background(50); // Displays the background colour as black.
     displayBallPuzzleText();
-    playJingle();
 
     updatePaddle(); // // Function that calls the paddles move and display properties.
     updateToken(); // Function that calls the number of token's Forloop.
@@ -599,15 +618,10 @@
     fill(255); // Makes the font white in colour.
     noStroke();
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
-    text(ballPuzzleHeading.string, ballPuzzleHeading.x, ballPuzzleHeading.y); // Displays the title of the game.
-    text(ballPuzzleSubHeading.string, ballPuzzleSubHeading.x, ballPuzzleSubHeading.y); // Displays the title of the game.
+    text(ballPuzzleHeading.string, ballPuzzleHeading.x, ballPuzzleHeading.y); // Displays the heading text.
+    text(ballPuzzleSubHeading.string, ballPuzzleSubHeading.x, ballPuzzleSubHeading.y); // Displays the secondary text.
+    text(ballPuzzleTertiaryHeading.string, ballPuzzleTertiaryHeading.x, ballPuzzleTertiaryHeading.y); // Displays the tertiary heading
     pop(); // Isolates code from using global properties.
-  }
-
-  function playJingle() {
-    if (!jeopardySFX.isPlaying()) { // States that if the click sound effect is not playing, it will be played everytime a ball touches the paddle
-      jeopardySFX.play();
-    }
   }
 
   function updatePaddle() { // Calls the function in Simulation
@@ -625,8 +639,9 @@
       }
     }
     if (numActiveTokens === 0) { // If we counted zero (0) active token, then change state to winner.
+     clearInterval(interval); // Clear the interval and set interval
+     interval = undefined; // Back to undefined to stop synth.
      state = `cameraRiddle`; // Swaps to cameraLoad state.
-     jeopardySFX.stop();
     }
   }
 
@@ -660,10 +675,30 @@
        }
      }
      if (numActiveBalls === 0) { // If we counted zero (0) active balls, then change state to loser.
+       clearInterval(interval); // Clear the interval and set interval
+       interval = undefined; // Back to undefined to stop synth.
        state = `loser`; // Swaps to loser state.
-       jeopardySFX.stop();
     }
   }
+
+  function playNextNote() { // playNextNote() plays the next note in our array
+    if (state === `ballPuzzle`) {
+
+
+      let note = notes[currentNote]; // Chose the note at the current position
+      synth.play(note, 0.2, 0.2, 0.2); // Play the synth
+      currentNote = currentNote + 1; // Increase the current position and go back to 0 when we reach the end
+
+        if (currentNote === notes.length) {
+          clearInterval(interval); // Clear the interval and set interval
+          interval = undefined; // Back to undefined to stop synth.
+          state = `loser`;
+      }
+    }
+  }
+
+
+
 
 
   // cameraRiddle STATE
@@ -929,7 +964,7 @@
 
   // MOUSE PRESS FUNCTION
   function mousePressed() {
-
+    // FALSE START CODE
     if (state === `falseStart`) {
       let d = dist(mouseX, mouseY, startButton.x, startButton.y);
       if (d < startButton.size / 2) {
@@ -938,6 +973,7 @@
       }
     }
 
+    // FINAL CHECK CODE
     if (state === `finalCheck`) {
       let d = dist(mouseX, mouseY, finalStartButton.x, finalStartButton.y);
       if (d < finalStartButton.size / 2) {
@@ -946,6 +982,7 @@
       }
     }
 
+    // ADDTIONAL BALL CODE
     if (state === 'ballPuzzle') { // Says only apply the below if in simulation state.
       let x = mouseX; // Makes the mouse capable of clicking on a x postion.
       let y = mouseY; // Males the mouse capable of clicking on a y postion.
@@ -956,7 +993,12 @@
       }
     }
 
+    // POLYSYNTH START AND STOP CODE
+    if (interval === undefined) { // First check that the piano isn't already playing. The interval will be undefined if it hasn't started
+      interval = setInterval(playNextNote, 500); // Start our interval, calling playRandomNote every 500 milliseconds. Assign the result to interval to remember the interval
+    }
   }
+
 
   // KEYTYPED FUNCTION
   function keyTyped() {
@@ -964,6 +1006,7 @@
       letters = letters + key;
     }
   }
+
 
   // KEYPRESSED FUNCTION
   function keyPressed () { // p5 function to perform action with keyboard input.
