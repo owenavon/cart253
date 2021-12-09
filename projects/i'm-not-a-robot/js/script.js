@@ -1,13 +1,13 @@
   // Project 2 - i'm not a robot
   // Owen Avon
 
-  // The objective of this program is for the user to prove that they are not a robot, and in fact an human behind the screen. These question will include slecting the correct answer, interacting in various mini games, etc. all wihtin a specified time.
+  // The objective of this program is for the user to prove that they are not a robot. The user must complete the various interactive games with precision and excellence, to ultimaley provve that they are indded human. Any mistake will see consequences.
 
-  // See "README" for a detailed"game plan".
+  // See "README" for a detailed "game plan".
 
   "use strict";
 
-  let state = `audioPuzzle`; // Starting state of program
+  let state = `landing`; // Starting state of program
 
   let letters = "";
   let riddleText;
@@ -32,6 +32,7 @@
   let clickSFX = undefined; // Sets clickSFX as a variable.
   let congratsSFX = undefined; // Sets congratsSFX as a variable.
   let cameraFlashSFX = undefined; // Sets cameraFlashSFX as a variable.
+  let ballPuzzleJingleSFX = undefined; // Sets cameraFlashSFX as a variable.
 
   let audioBall;
   let obstacles = [];
@@ -246,7 +247,8 @@
   function preload() { // P5 function that loads assets in prior to starting the simulation.
     clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
     congratsSFX = loadSound (`./assets/sounds/congrats.mp3`); // Preloads the "congarts" for efficient load times.
-    cameraFlashSFX = loadSound (`./assets/sounds/cameraFlash.mp3`); // Preloads the "congarts" for efficient load times.
+    cameraFlashSFX = loadSound (`./assets/sounds/cameraFlash.mp3`); // Preloads the "cameraFlash" for efficient load times.
+    ballPuzzleJingleSFX = loadSound (`./assets/sounds/ballPuzzleJingle.mp3`); // Preloads the "ballPuzzleJingle" for efficient load times.
     riddleText = loadStrings('./assets/text/riddle.txt'); // Preloads the "riddle" txt file efficient load times.
   }
 
@@ -536,6 +538,7 @@
     audioBallResources();
     audioObstacleTimer();
     audioObstacleStates();
+    audioPuzzleJingle();
   }
 
   function displayAudioPuzzleText() {
@@ -596,10 +599,21 @@
 
     if (!audioBall.alive) { // If the audioBall hits a obstacle, go to loser state
       state = `loser`;
+      ballPuzzleJingleSFX.stop(); // Stop the song from being played.
     }
 
     if (audioBall.y < 0) { // If the audioBall makes it past the top of the canvas then switch to the ballPuzzle state.
       state = `ballPuzzle`;
+      ballPuzzleJingleSFX.stop(); // Stop the song from being played
+    }
+  }
+
+  function audioPuzzleJingle() {
+    if (!ballPuzzleJingleSFX.isPlaying()) { // States that if the click sound effect is not playing, it will be played everytime a ball touches the paddle
+      if (state === `audioPuzzle`) { // Only play if it audioPuzzle state
+        ballPuzzleJingleSFX.play(); // Play track
+        loop(); // Restart the song when it finishes
+      }
     }
   }
 
@@ -685,7 +699,6 @@
 
   function playNextNote() { // playNextNote() plays the next note in our array
     if (state === `ballPuzzle`) {
-
 
       let note = notes[currentNote]; // Chose the note at the current position
       synth.play(note, 0.2, 0.2, 0.2); // Play the synth
