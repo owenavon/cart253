@@ -7,7 +7,7 @@
 
   "use strict";
 
-  let state = `falseStart`; // Starting state of program
+  let state = `audioPuzzle`; // Starting state of program
 
   let letters = "";
   let riddleText;
@@ -31,12 +31,13 @@
 
   let clickSFX = undefined; // Sets clickSFX as a variable.
   let congratsSFX = undefined; // Sets congratsSFX as a variable.
+  let cameraFlashSFX = undefined; // Sets cameraFlashSFX as a variable.
 
-  let audioCar;
-  let potholes = [];
+  let audioBall;
+  let obstacles = [];
 
-  let addPotholeInterval = 1 * 75; // How often to add a new vehicle (in frames). One every second The timer that will count down to 0 so we'll know when to add a new vehicle
-  let audioPuzzletimer = addPotholeInterval;
+  let addobstacleInterval = 1 * 75; // How often to add a new vehicle (in frames). One every second The timer that will count down to 0 so we'll know when to add a new vehicle
+  let audioPuzzletimer = addobstacleInterval;
 
   let startInstructionVisible = false;
   let startLandingVisible = false;
@@ -113,13 +114,13 @@
   }
 
   let audioPuzzleHeading = { // Creates custom object for secondary heading.
-    string: `Navigate the car up the road with your voice. (Or up arrow key...)`,
+    string: `Use your voice to navigate the ball upwards.`,
     x: 375,
     y: 100,
   }
 
   let audioPuzzleSubHeading = { // Creates custom object for secondary heading.
-    string: `The louder you talk, the faster the car moves. Avoid potholes at all costs.`,
+    string: `Perhaps the left and right arrows keys may help? Avoid obstacles at all costs.`,
     x: 375,
     y: 135,
   }
@@ -245,6 +246,7 @@
   function preload() { // P5 function that loads assets in prior to starting the simulation.
     clickSFX = loadSound (`./assets/sounds/click.mp3`); // Preloads the "click" for efficient load times.
     congratsSFX = loadSound (`./assets/sounds/congrats.mp3`); // Preloads the "congarts" for efficient load times.
+    cameraFlashSFX = loadSound (`./assets/sounds/cameraFlash.mp3`); // Preloads the "congarts" for efficient load times.
     riddleText = loadStrings('./assets/text/riddle.txt'); // Preloads the "riddle" txt file efficient load times.
   }
 
@@ -256,7 +258,7 @@
     generateFinalRobotButton();
     generateAudioInput();
     delayVirus();
-    generateAudioCar();
+    generateaudioBall();
 
     generatePaddle(); // Function that is called to generate the paddle.
     generateToken(); // Function that is called to generate the token.
@@ -290,10 +292,10 @@
       mic.start();
   }
 
-  function generateAudioCar() {
+  function generateaudioBall() {
     let x = width / 2;
     let y = height;
-    audioCar = new AudioCar(x, y);
+    audioBall = new AudioBall(x, y);
   }
 
   function generatePaddle() { // Function called in setup.
@@ -531,15 +533,15 @@
     background(125); // Displays the background colour as black.
 
     displayAudioPuzzleText();
-    audioCarResources();
-    audioPotholeTimer();
-    audioPotholeStates();
+    audioBallResources();
+    audioObstacleTimer();
+    audioObstacleStates();
   }
 
   function displayAudioPuzzleText() {
     push();
     textSize(fontSize.small); // Displays the font size as 32px.
-    fill(0); // Makes the font white in colour.
+    fill(255); // Makes the font white in colour.
     textAlign(CENTER, CENTER); // Dictates the text alignment style.
     noStroke();
     text(audioPuzzleHeading.string, audioPuzzleHeading.x, audioPuzzleHeading.y);
@@ -547,56 +549,56 @@
     pop();
   }
 
-  function audioCarResources() {
-    audioCar.handleInput();
-    audioCar.move();
-    audioCar.display();
+  function audioBallResources() {
+    audioBall.handleInput();
+    audioBall.move();
+    audioBall.display();
   }
 
-  function audioPotholeTimer() {
+  function audioObstacleTimer() {
     audioPuzzletimer -= 0.5; // Update our timer by counting down half a frame
 
     if (audioPuzzletimer <= 0) { // Check if our timer hit zero
       let y = random(0, 600);// Choose a random y position
       let r = random(0, 1);// Generate a random number for probability
-      let pothole = undefined; // We're going to randomly create a vehicle in this variable
+      let obstacle = undefined; // We're going to randomly create a vehicle in this variable
 
-      if (r < 0.5) { // Use comparisons with r to randomly create one of two types of potholes
-        pothole = new CanadianPothole(0, y);// Always create them at an x of 0 so they start on one side of the screen
+      if (r < 0.5) { // Use comparisons with r to randomly create one of two types of obstacles. Always create them at an x of 0 so they start on one side of the screen and translate horizontaly.
+        obstacle = new BigObstacle(0, y); // Calls class and sets parameters
       }
       else {
-        pothole = new AmericanPothole(0, y);
+        obstacle = new SmallObstacle(0, y);  // Calls class and sets parameters
       }
 
-      r = random(0, 1); // Generate another random number to control which direction the new potholes will move in
+      r = random(0, 1); // Generate another random number to control which direction the new obstacles will move in
       if (r < 0.1) { // Half the time left and half the time right. We also multiply the speed by a random number so that there's some variance between different
-        pothole.vx = -pothole.speed * random(0.5, 0.7);
+        obstacle.vx = -obstacle.speed * random(0.5, 0.7);
       } else {
-        pothole.vx = pothole.speed * random(0.5, 0.7);
+        obstacle.vx = obstacle.speed * random(0.5, 0.7);
       }
 
-      potholes.push(pothole); // Add our new potholes to the simulation by adding it to the array
-      audioPuzzletimer = addPotholeInterval; // Reset timer
+      obstacles.push(obstacle); // Add our new obstacles to the simulation by adding it to the array
+      audioPuzzletimer = addobstacleInterval; // Reset timer
     }
   }
 
-  function audioPotholeStates() {
+  function audioObstacleStates() {
     // Go through all the vehicles currently in the simulation
-    for (let i = 0; i < potholes.length; i++) {
-      let pothole = potholes[i];
+    for (let i = 0; i < obstacles.length; i++) {
+      let obstacle = obstacles[i];
       // Call its basic methods
-      pothole.move();
-      pothole.wrap();
-      pothole.display();
+      obstacle.move();
+      obstacle.wrap();
+      obstacle.display();
 
-      audioCar.checkHit(pothole); // Check whether the audioCar hit the pothole
+      audioBall.checkHit(obstacle); // Check whether the audioBall hit the obstacle
     }
 
-    if (!audioCar.alive) { // If the audioCar hits a pothole, go to loser state
+    if (!audioBall.alive) { // If the audioBall hits a obstacle, go to loser state
       state = `loser`;
     }
 
-    if (audioCar.y < 0) { // If the audioCar makes it past the top of the canvas then switch to the ballPuzzle state.
+    if (audioBall.y < 0) { // If the audioBall makes it past the top of the canvas then switch to the ballPuzzle state.
       state = `ballPuzzle`;
     }
   }
@@ -698,9 +700,6 @@
   }
 
 
-
-
-
   // cameraRiddle STATE
   function cameraRiddle() {
     background(100);
@@ -765,12 +764,22 @@
     pop();
 
     quickFlash();
+    cameraFlashJingleDelay();
   }
 
   function quickFlash () {
     flashCamera.size = flashCamera.size + 100;
     if(flashCamera.size > 750)
       state = `cameraLoad`;
+  }
+
+  function cameraFlashJingleDelay() {
+    if (frameCount % 1 == 0 && autoTimer > 0 && state === `cameraFlash`) { // Cheat to allow sound to play upon a state starting.
+      autoTimer --;
+      if (!cameraFlashSFX.isPlaying()) { // States that if the click sound effect is not playing, it will be played everytime a ball touches the paddle
+        cameraFlashSFX.play();
+      }
+    }
   }
 
 
@@ -821,6 +830,7 @@
       for (let i = 0; i < predictions.length; i++) { // If so run through the array of predictions
         // Get the object predicted
         let object = predictions[i];
+
         if (object.label === `person` && object.confidence > 0.93) {
           state = `finalCheck`;
         }
@@ -850,7 +860,6 @@
   // finalCheck STATE
   function finalCheck() { // Main landing state code.
     background(0); // Displays the background colour as black.
-
     finalFadeTextCheck();
     finalDisplayFalseStartText();
     finalStartButtonHighLight();
@@ -918,7 +927,7 @@
   function winner() { // Main landing state code.
     background(0); // Displays the background colour as black.
     winnerText();
-    jingleDelay();
+    finalJingleDelay();
   }
 
   function winnerText() {
@@ -931,15 +940,11 @@
     pop(); // Isolates code from using global properties.
   }
 
-
-  function jingleDelay() { // Main code for dynamic game clock.
-    if (frameCount % 1 == 0 && autoTimer > 0) { // Indicates that if the frameCount is divisible by 60, then a second has passed.
+  function finalJingleDelay() {
+    if (frameCount % 1 == 0 && autoTimer > 0 && state === `winner`) { // Cheat to allow sound to play upon a state starting.
       autoTimer --;
-    }
-    if (autoTimer == 0 && state === `winner` ) { // If the timer hits zero (0), then...
       if (!congratsSFX.isPlaying()) { // States that if the click sound effect is not playing, it will be played everytime a ball touches the paddle
         congratsSFX.play();
-
       }
     }
   }

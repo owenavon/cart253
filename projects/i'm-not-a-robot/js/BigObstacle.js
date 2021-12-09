@@ -1,5 +1,5 @@
 
-class CanadianPothole extends Pothole {
+class BigObstacle extends Obstacle {
   constructor(x,y) {
     super(x,y);
     this.width = 50;
