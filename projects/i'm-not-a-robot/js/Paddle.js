@@ -1,6 +1,13 @@
-class Paddle { // Creates a class that is called from script.js
+/***********************
+I'm not a Robot
+Owen Avon
 
-  constructor(w, h) { // function that creates an instance of a class.
+Displays the Paddle class and it's subsequent functions
+***********************/
+
+class Paddle {// Creates a class that is called from script.js
+  constructor(w, h) {
+    // function that creates an instance of a class.
     this.width = w; // Defines the width in generatePaddle function.
     this.height = h; // Defines the heightin generatePaddle function.
     this.x = 0; // Tells the program to display the paddle on the left side of the canvas.
@@ -13,7 +20,8 @@ class Paddle { // Creates a class that is called from script.js
     this.maxSpeed = 20; // Limits the paddle's speed from becoming arbitrarily fast.
   }
 
-  move() { // Function which is called in updatePaddle();
+  move() {
+    // Function which is called in updatePaddle();
     this.x = constrain(this.x, 0, width); // Constrains the paddle to the canvas width.
 
     this.x = this.x + this.vx; // Provides the paddle's with velocity to allow for horizontal movement.
@@ -22,18 +30,19 @@ class Paddle { // Creates a class that is called from script.js
     this.vx = this.vx + this.ax; // Provides a horizontal acceleration to the paddle's movement.
     this.vx = this.vx * this.friction; // Provides a frictional aspect to the paddle's movement.
 
-    if (keyIsDown(RIGHT_ARROW)) { // Hold "right" arrow key to move the paddle to the right.
+    if (keyIsDown(RIGHT_ARROW)) {
+      // Hold "right" arrow key to move the paddle to the right.
       this.ax = 0.3; // Provides an accleration when translated to the right.
-    }
-    else if (keyIsDown(LEFT_ARROW)) { // Hold "left" arrow key to move the paddle to the left.
+    } else if (keyIsDown(LEFT_ARROW)) {
+      // Hold "left" arrow key to move the paddle to the left.
       this.ax = -0.3; // Provides a deceleration when translated to the left.
-    }
-    else {
+    } else {
       this.ax = 0; // Else, does not provide an acceleration.
     }
   }
 
-  display() { // Function which is called in updatePaddle();
+  display() {
+    // Function which is called in updatePaddle();
     push(); // Isolates code from using global properties.
     fill(255); // Makes the paddle white in colour.
     noStroke(); // Remove stroke from paddle.

@@ -1,5 +1,11 @@
-class Token { // Creates a class that is called from script.js
+/***********************
+I'm not a Robot
+Owen Avon
 
+Displays the Token class and it's subsequent functions
+***********************/
+
+class Token { // Creates a class that is called from script.js
   constructor(horizontal, vertical, tokenSize, centreColor, outerColor) { // function that creates an instance of a class.
     this.x = horizontal; // Defines the x postion in generateToken function.
     this.y = vertical; // Defines the y postion in generateToken function.
@@ -13,7 +19,8 @@ class Token { // Creates a class that is called from script.js
     this.view = true; // Creates a boolean value to say that the variable is being "viewed" upon starting the simulation.
   }
 
-  display() { // Draw a circle with a heavy outline for the this
+  display() {
+    // Draw a circle with a heavy outline for the this
     push(); // Isolates code from using global properties.
     strokeWeight(this.tokenThickness); // Calls object to provide stroke thickness.
     fill(this.centreColor.r, this.centreColor.g, this.centreColor.b); // Calls object to color token's fill.
@@ -22,11 +29,13 @@ class Token { // Creates a class that is called from script.js
     pop(); // Isolates code from using global properties.
   }
 
-  disappear() { // Function that is called inside of tryToTouchToken in Ball.js
+  disappear() {
+    // Function that is called inside of tryToTouchToken in Ball.js
     this.size = this.size - this.shrinkage; // States that the token is to shrink upon overlap
 
-      if (this.size <= 0) { // States that if the token size becomes zero (0), then...
-        this.view = false; // set the boolean value to false, and thus stop drawing the token on the canvas.
-      }
+    if (this.size <= 0) {
+      // States that if the token size becomes zero (0), then...
+      this.view = false; // set the boolean value to false, and thus stop drawing the token on the canvas.
     }
   }
+}

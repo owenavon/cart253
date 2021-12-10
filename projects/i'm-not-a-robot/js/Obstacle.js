@@ -1,5 +1,11 @@
+/***********************
+I'm not a Robot
+Owen Avon
 
-class Obstacle {
+Code for the Obstacle class and it's subsequent functions
+***********************/
+
+class Obstacle { // Creates a class that is called from script.js
   constructor(x, y) {
     this.x = x;
     this.y = y;
@@ -19,7 +25,8 @@ class Obstacle {
     this.xOffset = this.xOffset + 0.005; // Sets value to offset, which in turns translates obstacles left and right within the provided value.
   }
 
-  wrap() { // Wrap to the other side of the canvas when the potholes leaves it
+  wrap() {
+    // Wrap to the other side of the canvas when the potholes leaves it
     if (this.x > width) {
       this.x -= width;
     } else if (this.x < 0) {
@@ -27,7 +34,7 @@ class Obstacle {
     }
   }
 
-  display() { // Here to remind me to implement a display method in the child classes
-
+  display() {
+    // Here to remind me to implement a display method in the child classes
   }
 }
