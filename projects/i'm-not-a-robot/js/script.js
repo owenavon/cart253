@@ -58,7 +58,7 @@ let mic; // Defines variable
 let autoTimer = 5; // Sets the timer's value.
 
 let textFade; // Defines variable
-let textFadeAmount = 1; // Text fade by 1 fps.
+let textFadeAmount = 2; // Text fade by 1 fps.
 
 let synth; // The synthesizer
 let notes = [ // The notes
